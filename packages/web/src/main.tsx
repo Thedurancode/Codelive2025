@@ -34,11 +34,6 @@ import {
 import sessionLoader from './routes/session';
 import secretsLoader from './routes/secrets';
 
-// Type for components with loaders
-type LoaderComponent<T = unknown> = React.LazyExoticComponent<React.ComponentType<unknown>> & {
-  loader?: () => Promise<T>;
-};
-
 // Initialize PostHog
 if (process.env.NODE_ENV === 'production') {
   posthog.init('phc_bQjmPYXmbl76j8gW289Qj9XILuu1STRnIfgCSKlxdgu', {

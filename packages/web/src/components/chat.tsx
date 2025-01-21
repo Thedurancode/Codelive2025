@@ -5,10 +5,6 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
 } from '@srcbook/components';
 import Markdown from './apps/markdown.js';
 import { diffFiles } from './apps/lib/diff.js';
@@ -16,7 +12,6 @@ import TextareaAutosize from 'react-textarea-autosize';
 import {
   ArrowUp,
   Minus,
-  Paperclip,
   LoaderCircle,
   History,
   PanelTopOpen,

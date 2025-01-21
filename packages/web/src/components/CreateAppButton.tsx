@@ -1,4 +1,3 @@
-import React from 'react';
 import { PlusIcon } from 'lucide-react';
 import { DropdownMenuItem } from '@srcbook/components/src/components/ui/dropdown-menu';
 

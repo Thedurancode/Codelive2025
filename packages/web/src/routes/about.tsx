@@ -1,5 +1,3 @@
-import { useSettings } from '@/components/use-settings';
-
 export default function About() {
   return (
     <div className="max-w-3xl mx-auto">
