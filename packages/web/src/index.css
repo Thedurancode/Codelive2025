@@ -1,0 +1,744 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Instrument+Sans:ital,wght@0,400..700;1,400..700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --sb-core-0: 0 0% 100%;
+    --sb-core-10: 210 33% 99%;
+    --sb-core-20: 210 7% 95%;
+    --sb-core-30: 204 7% 86%;
+    --sb-core-40: 207 7% 76%;
+    --sb-core-50: 205 7% 67%;
+    --sb-core-60: 204 7% 59%;
+    --sb-core-70: 203 7% 49%;
+    --sb-core-80: 205 11% 40%;
+    --sb-core-90: 204 16% 32%;
+    --sb-core-100: 203 17% 26%;
+    --sb-core-110: 204 17% 23%;
+    --sb-core-120: 206 16% 19%;
+    --sb-core-130: 203 17% 15%;
+    --sb-core-140: 204 17% 11%;
+    --sb-core-150: 206 18% 8%;
+    --sb-core-160: 200 16% 4%;
+
+    --sb-yellow-10: 33 100% 95%;
+    --sb-yellow-20: 33 100% 90%;
+    --sb-yellow-30: 33 97% 85%;
+    --sb-yellow-40: 34 96% 81%;
+    --sb-yellow-50: 35 95% 76%;
+    --sb-yellow-60: 33 76% 69%;
+    --sb-yellow-70: 35 31% 45%;
+    --sb-yellow-80: 34 28% 32%;
+
+    --sb-red-10: 0 100% 96%;
+    --sb-red-20: 0 100% 86%;
+    --sb-red-30: 0 100% 76%;
+    --sb-red-40: 0 100% 66%;
+    --sb-red-50: 0 66% 53%;
+    --sb-red-60: 0 66% 41%;
+    --sb-red-70: 0 74% 30%;
+    --sb-red-80: 0 82% 20%;
+
+    --sb-blue-10: 203 100% 95%;
+    --sb-blue-20: 202 100% 84%;
+    --sb-blue-30: 202 100% 73%;
+    --sb-blue-40: 202 100% 61%;
+    --sb-blue-50: 202 100% 50%;
+    --sb-blue-60: 202 100% 40%;
+    --sb-blue-70: 202 100% 30%;
+    --sb-blue-80: 202 100% 20%;
+
+    --sb-purple-10: 270 62% 96%;
+    --sb-purple-20: 270 78% 91%;
+    --sb-purple-60: 277 42% 57%;
+    --sb-purple-70: 277 34% 47%;
+    --sb-purple-80: 277 38% 38%;
+
+    --sb-green-20: 123 40% 90%;
+    --sb-green-80: 122 76% 20%;
+  }
+
+  :root {
+    --primary-hover: var(--sb-core-80);
+    --secondary-hover: var(--sb-core-80);
+    --tertiary: var(--sb-core-0);
+    --tertiary-foreground: var(--sb-core-60);
+    --ai: var(--sb-purple-10);
+    --ai-btn: var(--sb-purple-60);
+    --ai-ring: var(--sb-purple-60);
+    --ai-foreground: var(--sb-purple-80);
+    --ai-border: var(--sb-purple-20);
+    --run: var(--sb-yellow-50);
+    --run-foreground: var(--sb-core-100);
+    --run-ring: var(--sb-yellow-50);
+    --inline-code: var(--sb-core-20);
+    --inline-code-foreground: var(--foreground);
+    --error: var(--sb-red-30);
+    --error-foreground: var(--sb-red-80);
+    --error-background-subtle: hsl(var(--sb-red-40) / 0.1);
+    --warning: var(--sb-yellow-20);
+    --warning-foreground: var(--sb-yellow-80);
+    --warning-background-subtle: hsl(var(--sb-yellow-50) / 0.1);
+  }
+
+  .dark {
+    --primary-hover: var(--sb-core-30);
+    --secondary-hover: var(--sb-core-30);
+    --tertiary: var(--sb-core-130);
+    --tertiary-foreground: var(--sb-core-60);
+    --ai: 277 42% 57% / 0.1;
+    --ai-foreground: 269 100% 83%;
+    --ai-border: 277 42% 57% / 0.2;
+    --run: var(--sb-yellow-50);
+    --run-foreground: var(--sb-core-100);
+    --run-ring: var(--sb-yellow-50);
+    --inline-code: var(--sb-core-110);
+    --inline-code-foreground: var(--foreground);
+    --error: var(--sb-red-30);
+    --error-foreground: var(--sb-red-80);
+    --error-background-subtle: hsl(var(--sb-red-40) / 0.1);
+    --warning: var(--sb-yellow-20);
+    --warning-foreground: var(--sb-yellow-80);
+    --warning-background-subtle: hsl(var(--sb-yellow-50) / 0.1);
+  }
+
+  /* shadcn variables light */
+  :root {
+    --background: var(--sb-core-0);
+    --foreground: var(--sb-core-100);
+    --card: var(--sb-core-0);
+    --card-foreground: var(--sb-core-100);
+    --popover: var(--sb-core-0);
+    --popover-foreground: var(--sb-core-100);
+    --primary: var(--sb-core-100);
+    --primary-foreground: var(--sb-core-0);
+    --secondary: var(--sb-core-0);
+    --secondary-foreground: var(--sb-core-100);
+    --muted: var(--sb-core-10);
+    --muted-foreground: var(--sb-core-30);
+    --accent: var(--sb-blue-60);
+    --accent-foreground: var(--sb-core-0);
+    --destructive: var(--sb-red-40);
+    --destructive-foreground: var(--sb-core-0);
+    --border: var(--sb-core-30);
+    --input: var(--sb-core-30);
+    --ring: var(--sb-core-100);
+  }
+
+  /* shadcn variables dark */
+  .dark {
+    --background: var(--sb-core-130);
+    --foreground: var(--sb-core-0);
+    --card: var(--sb-core-130);
+    --card-foreground: var(--sb-core-0);
+    --popover: var(--sb-core-130);
+    --popover-foreground: var(--sb-core-0);
+    --primary: var(--sb-core-0);
+    --primary-foreground: var(--sb-core-100);
+    --secondary: var(--sb-core-130);
+    --secondary-foreground: var(--sb-core-40);
+    --muted: var(--sb-core-120);
+    --muted-foreground: var(--sb-core-90);
+    --accent: var(--sb-blue-60);
+    --accent-foreground: var(--sb-core-0);
+    --destructive: var(--sb-red-40);
+    --destructive-foreground: var(--sb-core-0);
+    --border: var(--sb-core-100);
+    --input: var(--sb-core-100);
+    --ring: var(--sb-core-0);
+  }
+}
+
+@layer components {
+  .title {
+    font-size: 2rem;
+    line-height: 1;
+    font-weight: 500;
+  }
+
+  .h1 {
+    font-size: 1.875rem;
+    line-height: 2.375rem;
+    font-weight: 500;
+  }
+
+  .h2 {
+    font-size: 1.5rem;
+    line-height: 2rem;
+    font-weight: 500;
+  }
+
+  .h3 {
+    font-size: 1.25rem;
+    line-height: 1.875rem;
+    font-weight: 500;
+  }
+
+  .h4 {
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+    font-weight: 500;
+  }
+
+  .h5 {
+    font-size: 1rem;
+    line-height: 1.5rem;
+    font-weight: 500;
+  }
+
+  .p {
+    font-size: 1rem;
+    line-height: 1.5rem;
+    font-weight: 300;
+  }
+
+  .code {
+    @apply text-sm;
+    @apply rounded-sm;
+    @apply px-1;
+    @apply py-0.5;
+    @apply mx-0.5;
+    @apply bg-muted;
+    @apply text-inline-code-foreground;
+  }
+
+  .code-mini {
+    @apply text-xs;
+    @apply rounded-sm;
+    @apply px-0.5;
+    @apply bg-muted;
+    @apply text-inline-code-foreground;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+.sb-prose {
+  @apply font-sans;
+  @apply text-base;
+  @apply leading-7;
+}
+
+.sb-prose > *:first-child {
+  margin-top: 0;
+}
+
+.sb-prose > *:last-child {
+  margin-bottom: 0;
+}
+
+.sb-prose p {
+  @apply my-3;
+}
+
+.sb-prose a {
+  font-weight: bold;
+  @apply underline;
+  @apply decoration-2;
+  @apply underline-offset-2;
+}
+
+.sb-prose a:hover {
+  @apply text-primary-hover;
+}
+
+.sb-prose blockquote {
+  @apply font-semibold;
+  @apply my-5;
+  @apply italic;
+  @apply text-tertiary-foreground;
+  @apply ps-5;
+  @apply border-s-4;
+  @apply border-s-border;
+  quotes: '\201C' '\201D' '\2018' '\2019';
+}
+
+.sb-prose blockquote p:first-of-type::before {
+  content: open-quote;
+}
+
+.sb-prose blockquote p:last-of-type::after {
+  content: close-quote;
+}
+
+.sb-prose pre {
+  @apply overflow-x-auto;
+  @apply bg-muted;
+  @apply text-foreground;
+  @apply text-base;
+  @apply p-4;
+  @apply rounded-sm;
+  @apply my-4;
+}
+
+.sb-prose code:not(pre code) {
+  @apply code;
+}
+
+.sb-prose h1 > code,
+.sb-prose h2 > code,
+.sb-prose h3 > code,
+.sb-prose h4 > code,
+.sb-prose h5 > code {
+  @apply font-mono;
+  /* No way to avoid !important given specificity priority and the fact that we don't generate the HTML */
+  font-size: 80% !important;
+  @apply px-1.5 !important;
+  @apply font-normal;
+}
+
+.sb-prose h1 {
+  @apply h1;
+  @apply my-5;
+}
+
+.sb-prose h2 {
+  @apply h2;
+  @apply my-5;
+}
+
+.sb-prose h3 {
+  @apply h3;
+  @apply my-4;
+}
+
+.sb-prose h4 {
+  @apply h4;
+  @apply my-3;
+}
+
+.sb-prose h5 {
+  @apply h5;
+  @apply my-3;
+}
+
+.sb-prose hr {
+  @apply my-5;
+}
+
+.sb-prose ol {
+  @apply list-decimal;
+  @apply ps-6;
+  margin: 1.15em 0;
+}
+
+.sb-prose ol > li:marker {
+  @apply font-normal;
+}
+
+.sb-prose ul {
+  @apply list-disc;
+  @apply ps-6;
+  margin: 1.15em 0;
+}
+
+.sb-prose li {
+  margin: 5px 0;
+}
+
+.sb-prose ol > li {
+  @apply ps-1.5;
+  @apply my-1;
+}
+
+.sb-prose ul > li {
+  @apply ps-1.5;
+  @apply my-1;
+}
+
+.sb-prose img {
+  border-radius: 3px;
+}
+
+.sb-prose-mini {
+  @apply font-sans;
+  @apply text-xs;
+  @apply leading-3;
+}
+
+.sb-prose-mini > *:first-child {
+  margin-top: 0;
+}
+
+.sb-prose-mini > *:last-child {
+  margin-bottom: 0;
+}
+
+.sb-prose-mini p {
+  @apply my-1;
+}
+
+.sb-prose-mini a {
+  font-weight: 50;
+  @apply underline;
+  @apply decoration-1;
+  @apply underline-offset-1;
+}
+
+.sb-prose-mini a:hover {
+  @apply text-primary-hover;
+}
+
+.sb-prose-mini blockquote {
+  @apply font-semibold;
+  @apply my-3;
+  @apply italic;
+  @apply text-tertiary-foreground;
+  @apply ps-2;
+  @apply border-s-2;
+  @apply border-s-border;
+  quotes: '\201C' '\201D' '\2018' '\2019';
+}
+
+.sb-prose-mini blockquote p:first-of-type::before {
+  content: open-quote;
+}
+
+.sb-prose-mini blockquote p:last-of-type::after {
+  content: close-quote;
+}
+
+.sb-prose-mini pre {
+  @apply text-xs;
+  @apply overflow-x-auto;
+  @apply bg-muted;
+  @apply text-foreground;
+  @apply p-2;
+  @apply rounded-sm;
+  @apply border;
+  @apply border-border;
+}
+
+.sb-prose-mini code:not(pre code) {
+  @apply code-mini;
+}
+
+.sb-prose-mini h1 > code,
+.sb-prose-mini h2 > code,
+.sb-prose-mini h3 > code,
+.sb-prose-mini h4 > code,
+.sb-prose-mini h5 > code {
+  @apply font-mono;
+  /* No way to avoid !important given specificity priority and the fact that we don't generate the HTML */
+  font-size: 80% !important;
+  @apply px-1.5 !important;
+  @apply font-normal;
+}
+
+.sb-prose-mini h1 {
+  @apply text-xl;
+  @apply my-2;
+}
+
+.sb-prose-mini h2 {
+  @apply text-lg;
+  @apply my-2;
+}
+
+.sb-prose-mini h3 {
+  @apply text-lg;
+  @apply my-2;
+}
+
+.sb-prose-mini h4 {
+  @apply text-sm;
+  @apply my-1;
+}
+
+.sb-prose-mini h5 {
+  @apply text-sm;
+  @apply my-1;
+}
+
+.sb-prose-mini hr {
+  @apply my-2;
+}
+
+.sb-prose-mini ol {
+  @apply list-decimal;
+  @apply ps-2;
+  margin: 1.15em 0;
+}
+
+.sb-prose-mini ol > li:marker {
+  @apply font-normal;
+}
+
+.sb-prose-mini ul {
+  @apply list-disc;
+  @apply ps-2;
+  margin: 0.75em 0;
+}
+
+.sb-prose-mini li {
+  margin: 3px 0;
+}
+
+.sb-prose-mini ol > li {
+  @apply ps-1.5;
+  @apply my-1;
+}
+
+.sb-prose-mini ul > li {
+  @apply ps-1.5;
+  @apply my-1;
+}
+
+.sb-prose-mini img {
+  border-radius: 1.5px;
+}
+
+.sb-prose-chat {
+  @apply font-sans;
+  @apply text-sm;
+  @apply leading-5;
+}
+
+.sb-prose-chat > *:first-child {
+  margin-top: 0;
+}
+
+.sb-prose-chat > *:last-child {
+  margin-bottom: 0;
+}
+
+.sb-prose-chat p {
+  @apply my-2;
+}
+
+.sb-prose-chat a {
+  font-weight: bold;
+  @apply underline;
+  @apply decoration-2;
+  @apply underline-offset-2;
+}
+
+.sb-prose-chat a:hover {
+  @apply text-primary-hover;
+}
+
+.sb-prose-chat blockquote {
+  @apply font-medium;
+  @apply my-3;
+  @apply italic;
+  @apply text-tertiary-foreground;
+  @apply ps-4;
+  @apply border-s-2;
+  @apply border-s-border;
+  quotes: '\201C' '\201D' '\2018' '\2019';
+}
+
+.sb-prose-chat blockquote p:first-of-type::before {
+  content: open-quote;
+}
+
+.sb-prose-chat blockquote p:last-of-type::after {
+  content: close-quote;
+}
+
+.sb-prose-chat pre {
+  @apply overflow-x-auto;
+  @apply bg-muted;
+  @apply text-foreground;
+  @apply p-3;
+  @apply rounded-sm;
+  @apply my-3;
+}
+
+.sb-prose-chat code:not(pre code) {
+  @apply text-sm;
+  @apply rounded-sm;
+  @apply px-1;
+  @apply py-0.5;
+  @apply mx-0.5;
+  @apply bg-muted;
+  @apply text-inline-code-foreground;
+}
+
+.sb-prose-chat h1 > code,
+.sb-prose-chat h2 > code,
+.sb-prose-chat h3 > code,
+.sb-prose-chat h4 > code,
+.sb-prose-chat h5 > code {
+  @apply font-mono;
+  /* No way to avoid !important given specificity priority and the fact that we don't generate the HTML */
+  font-size: 80% !important;
+  @apply px-1.5 !important;
+  @apply font-normal;
+}
+
+.sb-prose-chat h1 {
+  font-size: 1.5rem;
+  line-height: 2rem;
+  font-weight: 500;
+  @apply my-3;
+}
+
+.sb-prose-chat h2 {
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+  font-weight: 500;
+  @apply my-3;
+}
+
+.sb-prose-chat h3 {
+  font-size: 1.1rem;
+  line-height: 1.675rem;
+  font-weight: 500;
+  @apply my-2;
+}
+
+.sb-prose-chat h4 {
+  font-size: 1rem;
+  line-height: 1.5rem;
+  font-weight: 500;
+  @apply my-2;
+}
+
+.sb-prose-chat h5 {
+  font-size: 0.9rem;
+  line-height: 1.4rem;
+  font-weight: 500;
+  @apply my-2;
+}
+
+.sb-prose-chat hr {
+  @apply my-3;
+}
+
+.sb-prose-chat ol {
+  @apply list-decimal;
+  @apply ps-6;
+  margin: 1em 0;
+}
+
+.sb-prose-chat ol > li:marker {
+  @apply font-normal;
+}
+
+.sb-prose-chat ul {
+  @apply list-disc;
+  @apply ps-6;
+  margin: 1em 0;
+}
+
+.sb-prose-chat li {
+  margin: 3px 0;
+}
+
+.sb-prose-chat ol > li {
+  @apply ps-1.5;
+  @apply my-1;
+}
+
+.sb-prose-chat ul > li {
+  @apply ps-1.5;
+  @apply my-1;
+}
+
+.sb-prose-chat img {
+  border-radius: 3px;
+}
+
+.cm-editor {
+  @apply h-full;
+  @apply rounded-b;
+  @apply text-sm;
+  @apply overflow-auto;
+}
+
+.cm-editor.cm-focused {
+  outline: none;
+  border: none;
+}
+
+.cm-editor .cm-gutters {
+  @apply rounded-bl;
+  @apply bg-background;
+}
+
+.cm-editor .cm-gutters .cm-gutterElement {
+  @apply px-1.5;
+  padding-top: 1px;
+  font-size: 12px;
+  min-width: 2rem;
+}
+
+.cm-editor .cm-gutters .cm-activeLineGutter {
+  background-color: transparent;
+}
+
+.cm-editor .cm-scroller {
+  overflow: auto;
+  height: 100%;
+}
+
+.cm-editor .cm-gutters,
+.cm-editor .cm-content {
+  min-height: '100px';
+}
+
+.cm-editor del {
+  text-decoration: none;
+}
+
+.cm-editor .cm-deletedChunk {
+  background-color: rgba(248, 81, 73, 0.15);
+}
+
+.cm-editor.cm-merge-a .cm-changedLine,
+.cm-editor.cm-merge-b .cm-changedLine {
+  background-color: rgba(46, 160, 67, 0.15);
+}
+
+.cm-editor * {
+  font-family: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas',
+    'Liberation Mono', 'Courier New', 'monospace';
+}
+
+.cm-tooltip {
+  @apply overflow-hidden;
+  @apply !bg-background;
+  @apply border;
+  @apply shadow-md;
+  @apply !border-border;
+}
+
+.cm-tooltip-autocomplete {
+  @apply overflow-hidden;
+  @apply !bg-background;
+  @apply border;
+  @apply shadow-md;
+  @apply !border-border;
+}
+
+.cm-tooltip.cm-tooltip-autocomplete ul {
+  font-family: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas',
+    'Liberation Mono', 'Courier New', 'monospace';
+}
+
+.cm-tooltip.cm-tooltip-autocomplete ul li.custom-class {
+  @apply !bg-muted;
+  @apply !text-foreground;
+  font-style: normal;
+}
+
+.cm-diagnostic {
+  @apply ml-0;
+  @apply !p-0;
+}
+
+.cm-tooltip-section:not(:first-child) {
+  @apply !border-t-0;
+}

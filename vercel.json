@@ -1,0 +1,26 @@
+{
+  "build": {
+    "env": {
+      "VITE_API_URL": "/api",
+      "NODE_ENV": "production"
+    },
+    "outputDirectory": "packages/web/public",
+    "public": "packages/web/public",
+    "build": {
+      "outputDirectory": "packages/web/public",
+      "public": "packages/web/public"
+    },
+    "buildCommand": "cd packages/web && pnpm run build"
+  },
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "packages/api/index.mts",
+      "methods": ["GET", "POST", "PUT", "DELETE"]
+    },
+    {
+      "src": "/(.*)",
+      "dest": "packages/web/public/$1"
+    }
+  ]
+}

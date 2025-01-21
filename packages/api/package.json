@@ -1,0 +1,55 @@
+{
+  "name": "@srcbook/api",
+  "version": "0.0.15",
+  "type": "module",
+  "main": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "files": [
+    "dist/**"
+  ],
+  "scripts": {
+    "dev": "vite-node -w dev-server.mts",
+    "test": "vitest",
+    "prebuild": "rm -rf ./dist",
+    "build": "tsc && cp -R ./drizzle ./dist/drizzle && cp -R ./srcbook/examples ./dist/srcbook/examples && cp -R ./prompts ./dist/prompts && cp -R ./apps/templates ./dist/apps/templates",
+    "lint": "eslint . --max-warnings 0",
+    "check-types": "tsc",
+    "depcheck": "depcheck",
+    "generate": "drizzle-kit generate",
+    "migrate": "drizzle-kit migrate",
+    "prepublishOnly": "tsc",
+    "preversion": "vitest run && pnpm run build",
+    "postversion": "git push && git push --tags"
+  },
+  "dependencies": {
+    "@ai-sdk/anthropic": "catalog:",
+    "@ai-sdk/google": "^1.0.3",
+    "@ai-sdk/openai": "catalog:",
+    "@ai-sdk/provider": "^1.0.1",
+    "@srcbook/shared": "workspace:^",
+    "ai": "^3.4.33",
+    "archiver": "^7.0.1",
+    "better-sqlite3": "^11.3.0",
+    "cors": "^2.8.5",
+    "depcheck": "^1.4.7",
+    "drizzle-orm": "^0.33.0",
+    "express": "^4.20.0",
+    "fast-xml-parser": "^4.5.0",
+    "marked": "catalog:",
+    "posthog-node": "^4.2.0",
+    "simple-git": "^3.27.0",
+    "ws": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@types/archiver": "^6.0.2",
+    "@types/better-sqlite3": "^7.6.11",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/ws": "^8.5.12",
+    "drizzle-kit": "^0.24.2",
+    "vite": "^5.4.4",
+    "vite-node": "^2.0.5",
+    "vitest": "^2.0.5"
+  }
+}

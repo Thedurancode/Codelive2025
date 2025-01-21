@@ -1,0 +1,111 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1718315667825,
+      "tag": "0000_initial",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1718740690892,
+      "tag": "0001_favorite_language",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1720548526434,
+      "tag": "0002_add-openai-key",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1720719921668,
+      "tag": "0003_posthog_analytics",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1722982500003,
+      "tag": "0004_add_ai_config",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1723676786701,
+      "tag": "0005_new_provider_ai_models",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1723745583289,
+      "tag": "0006_deprecate_ai_config",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "6",
+      "when": 1725736805777,
+      "tag": "0007_add_subscription_email",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1726084159070,
+      "tag": "0008_add_secrets",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "6",
+      "when": 1726250539939,
+      "tag": "0009_secret_session_unique",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "6",
+      "when": 1726808187994,
+      "tag": "0010_create_apps",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "6",
+      "when": 1729112512747,
+      "tag": "0011_remove_language_from_apps",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "6",
+      "when": 1729193497907,
+      "tag": "0012_add_app_history",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "6",
+      "when": 1731347691803,
+      "tag": "0013_add_x_ai",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "6",
+      "when": 1732197490638,
+      "tag": "0014_Gemini_Integration",
+      "breakpoints": true
+    }
+  ]
+}

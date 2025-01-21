@@ -1,0 +1,11 @@
+{
+  "extends": "@srcbook/configs/ts/base.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "allowImportingTsExtensions": false,
+    "outDir": "dist",
+    "types": ["vitest/globals", "vite/client"]
+  },
+  "include": ["**/*.mts"],
+  "exclude": ["node_modules", "dist"]
+}

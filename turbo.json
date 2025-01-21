@@ -1,0 +1,37 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "ui": "tui",
+  "globalEnv": [
+    "NODE_ENV",
+    "VITE_SRCBOOK_API_ORIGIN",
+    "VITE_SRCBOOK_API_HOST",
+    "VITE_SRCBOOK_DEBUG_RENDER_SESSION_AS_READ_ONLY",
+    "SRCBOOK_DISABLE_ANALYTICS",
+    "PORT",
+    "HOME"
+  ],
+  "tasks": {
+    "//#format": {},
+    "//#check-format": {},
+    "dev": {
+      "persistent": true,
+      "cache": false
+    },
+    "build": {
+      "outputs": ["dist/**"],
+      "dependsOn": ["^build"]
+    },
+    "check-types": {
+      "dependsOn": ["^check-types"]
+    },
+    "start": {
+      "dependsOn": ["^build"]
+    },
+    "test": {
+      "dependsOn": ["^build"]
+    },
+    "lint": {
+      "dependsOn": ["^build"]
+    }
+  }
+}
