@@ -74,7 +74,9 @@ export default function Home() {
   }
 
   return (
-    <div className="divide-y divide-border space-y-8 pb-10">
+    <div className="divide-y divide-border space-y-8 pb-10 bg-gradient-to-br from-core-140 to-core-150 relative overflow-hidden">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_500px_at_50%_200px,rgba(120,119,198,0.1),transparent)] dark:bg-[radial-gradient(circle_800px_at_50%_-100px,rgba(120,119,198,0.05),transparent)]" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(120,119,198,0.05)_1px,transparent_1px),linear-gradient(to_bottom,rgba(120,119,198,0.05)_1px,transparent_1px)] bg-[size:24px_24px]" />
       {showCreateAppModal && (
         <CreateAppModal onClose={() => setShowCreateAppModal(false)} onCreate={onCreateApp} />
       )}

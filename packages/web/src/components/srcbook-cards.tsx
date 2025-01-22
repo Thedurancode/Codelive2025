@@ -191,24 +191,24 @@ export function AppCard(props: AppCardPropsType) {
   return (
     <CardContainer
       onClick={props.onClick}
-      className="group relative bg-gradient-to-br from-background to-muted hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border hover:border-blue-500/20 active:translate-y-0 h-[140px] overflow-hidden"
+      className="group relative bg-[hsl(240_4%_12%)] hover:bg-[hsl(240_4%_14%)] hover:shadow-2xl hover:shadow-black/20 transition-all duration-300 hover:-translate-y-1 border border-[hsl(240_4%_16%)] hover:border-[hsl(240_4%_20%)] active:translate-y-0 h-[140px] overflow-hidden backdrop-blur-xl"
     >
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-500/[0.02] to-purple-500/[0.02] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-      <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-blue-500/30 to-purple-500/30 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
+      <div className="absolute inset-0 bg-gradient-to-br from-white/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-white/10 via-white/5 to-transparent" />
       
       <div className="flex flex-col h-full p-5 relative">
         <div className="flex-1">
-          <h3 className="font-semibold text-lg leading-tight line-clamp-2 group-hover:text-blue-500/90 transition-colors duration-300">
+          <h3 className="font-semibold text-lg leading-tight line-clamp-2 text-white/90 group-hover:text-white transition-colors duration-300">
             {props.name}
           </h3>
         </div>
 
         <div className="flex items-end justify-between pt-2">
           <div className="flex flex-col gap-0.5">
-            <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground/70">
+            <span className="text-[11px] font-medium uppercase tracking-wider text-white/40">
               Last edited
             </span>
-            <span className="text-sm text-muted-foreground">
+            <span className="text-sm text-white/60">
               {formatTimeAgo(props.updatedAt)}
             </span>
           </div>
@@ -216,7 +216,7 @@ export function AppCard(props: AppCardPropsType) {
           <button
             type="button"
             onClick={onDelete}
-            className="p-1.5 rounded-md hover:bg-red-500/10 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
+            className="p-1.5 rounded-md hover:bg-red-500/10 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100"
           >
             <Trash2 size={14} />
           </button>
@@ -308,16 +308,17 @@ export function CreateAppButton(props: { defaultLanguage: CodeLanguageType; onCl
   return (
     <CardContainer
       onClick={() => props.onClick()}
-      className="group relative bg-gradient-to-br from-emerald-500/[0.03] to-emerald-600/[0.03] hover:from-emerald-500/[0.05] hover:to-emerald-600/[0.05] border-emerald-600/20 hover:border-emerald-500/30 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 active:translate-y-0"
+      className="group relative bg-[hsl(240_4%_12%)] hover:bg-[hsl(240_4%_14%)] hover:shadow-2xl hover:shadow-black/20 transition-all duration-300 hover:-translate-y-1 border border-[hsl(240_4%_16%)] hover:border-[hsl(240_4%_20%)] active:translate-y-0 backdrop-blur-xl"
     >
-      <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-emerald-500/40 to-emerald-600/40 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
+      <div className="absolute inset-0 bg-gradient-to-br from-white/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-white/10 via-white/5 to-transparent" />
       
       <div className="flex items-center justify-center h-full">
         <div className="flex items-center gap-2.5">
-          <div className="p-2 rounded-md bg-emerald-500/10 text-emerald-500">
+          <div className="p-2 rounded-md bg-white/5 text-white/80 group-hover:bg-white/10 group-hover:text-white transition-all duration-300">
             <PlusIcon size={18} className="transition-transform duration-300 group-hover:rotate-90" />
           </div>
-          <h3 className="font-semibold text-lg whitespace-nowrap text-emerald-700/80 dark:text-emerald-400/90 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors duration-300">
+          <h3 className="font-semibold text-lg whitespace-nowrap text-white/80 group-hover:text-white transition-colors duration-300">
             New project
           </h3>
         </div>

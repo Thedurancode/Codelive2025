@@ -92,7 +92,6 @@ export function SessionNavbar(props: SessionNavbarProps) {
                   alt="Codelive" 
                   className="w-60 h-16 transition-transform duration-200 group-hover:scale-105" 
                 />
-                <div className="absolute -inset-1 bg-blue-400/20 rounded-lg blur-md group-hover:bg-blue-400/30 transition-all duration-200"></div>
               </div>
               <span className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-blue-100">
                 Codelive
@@ -107,7 +106,7 @@ export function SessionNavbar(props: SessionNavbarProps) {
 
 export function Navbar() {
   return (
-    <header className="h-20 w-full flex items-center justify-between fixed bg-black z-50 border-b border-border/20">
+    <header className="h-16 w-full flex items-center justify-between fixed bg-black z-50 border-b border-border/20">
       <nav className="w-full flex items-center justify-between px-8">
         <div className="flex-1">
           <NavLink to="/" className="flex items-center group">
@@ -115,9 +114,9 @@ export function Navbar() {
               <img 
                 src="/assets/logo.png" 
                 alt="Codelive" 
-                className="w-44 h-12 transition-transform duration-200 group-hover:scale-105" 
+                className="w-48 h-10 transition-transform duration-200 group-hover:scale-105" 
               />
-              <div className="absolute -inset-1 bg-blue-500/10 rounded-lg blur-sm opacity-0 group-hover:opacity-100 transition-all duration-200"></div>
+              <div className="absolute -inset-1 bg-red-950/20 rounded-lg blur-sm opacity-0 group-hover:opacity-100 transition-all duration-200"></div>
             </div>
           </NavLink>
         </div>
@@ -128,8 +127,8 @@ export function Navbar() {
               <NavLink
                 to="/settings"
                 className={({ isActive }) => 
-                  `group flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 hover:bg-blue-500/10 ${
-                    isActive ? 'text-blue-400 bg-blue-500/5' : 'text-gray-300'
+                  `group flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 hover:bg-red-950/20 ${
+                    isActive ? 'text-red-700 bg-red-950/10' : 'text-gray-300'
                   }`
                 }
               >
@@ -141,8 +140,8 @@ export function Navbar() {
               <NavLink
                 to="/about"
                 className={({ isActive }) => 
-                  `group flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 hover:bg-blue-500/10 ${
-                    isActive ? 'text-blue-400 bg-blue-500/5' : 'text-gray-300'
+                  `group flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 hover:bg-red-950/20 ${
+                    isActive ? 'text-red-700 bg-red-950/10' : 'text-gray-300'
                   }`
                 }
               >

@@ -29,46 +29,14 @@ function Settings() {
       <h4 className="h4 mx-auto mb-6">Settings</h4>
       <div className="space-y-10">
         <div>
-          <h2 className="text-base font-medium">Theme</h2>
-          <label className="opacity-70 text-sm" htmlFor="theme-switch">
-            Select light or dark mode for the Srcbook app.
-          </label>
-          <div className="flex items-center gap-2 mt-2">
-            <Switch id="theme-switch" checked={theme === 'dark'} onCheckedChange={toggleTheme} />
-            <label htmlFor="theme-switch">
-              <span className="text-sm font-medium">Dark mode</span>
-            </label>
-          </div>
-        </div>
-
-        <div>
-          <h2 className="text-base font-medium">Default Language</h2>
-          <label className="opacity-70 block pb-3 text-sm" htmlFor="language-selector">
-            The default language to use when creating new Srcbooks.
-          </label>
-          <Select onValueChange={updateDefaultLanguage}>
-            <SelectTrigger id="language-selector" className="w-[180px]">
-              <SelectValue
-                placeholder={defaultLanguage === 'typescript' ? 'TypeScript' : 'JavaScript'}
-              />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="typescript">TypeScript</SelectItem>
-              <SelectItem value="javascript">JavaScript</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div>
-          <h2 className="text-base font-medium">AI</h2>
+          <h2 className="text-base font-medium">Enter Your Codelive Api Key</h2>
           <div className="flex flex-col">
             <label className="opacity-70 text-sm pb-3" htmlFor="ai-provider-selector">
-              Select your preferred LLM and enter your credentials to use Srcbook's AI features.
+              
             </label>
           </div>
           <AiSettings />
         </div>
-
       </div>
     </div>
   );
@@ -163,7 +131,7 @@ const TestAiButton = () => {
             className="flex items-center gap-2 bg-secondary text-secondary-foreground border border-border hover:bg-muted hover:text-secondary-hover rounded-sm text-sm font-medium px-3 py-1"
             onClick={check}
           >
-            Test AI config
+            Test Connection
           </button>
         </div>
       )}
@@ -197,181 +165,49 @@ export function AiSettings({ saveButtonLabel }: AiSettingsProps) {
   const {
     aiProvider,
     aiModel,
-    aiBaseUrl,
-    openaiKey: configOpenaiKey,
-    anthropicKey: configAnthropicKey,
     xaiKey: configXaiKey,
-    geminiKey: configGeminiKey,
     updateConfig: updateConfigContext,
   } = useSettings();
 
-  const [openaiKey, setOpenaiKey] = useState<string>(configOpenaiKey ?? '');
-  const [anthropicKey, setAnthropicKey] = useState<string>(configAnthropicKey ?? '');
   const [xaiKey, setXaiKey] = useState<string>(configXaiKey ?? '');
-  const [geminiKey, setGeminiKey] = useState<string>(configGeminiKey ?? '');
-  const [model, setModel] = useState<string>(aiModel);
-  const [baseUrl, setBaseUrl] = useState<string>(aiBaseUrl || '');
-
-  const setAiProvider = (provider: AiProviderType) => {
-    const model = getDefaultModel(provider);
-    setModel(model);
-    updateConfigContext({ aiProvider: provider, aiModel: model });
-  };
+  const model = "deepseek-chat";
 
   // Either the key from the server is null/undefined and the user entered input
   // or the key from the server is a string and the user entered input is different.
-  const openaiKeySaveEnabled =
-    (typeof configOpenaiKey === 'string' && openaiKey !== configOpenaiKey) ||
-    ((configOpenaiKey === null || configOpenaiKey === undefined) && openaiKey.length > 0) ||
-    model !== aiModel;
-
-  const anthropicKeySaveEnabled =
-    (typeof configAnthropicKey === 'string' && anthropicKey !== configAnthropicKey) ||
-    ((configAnthropicKey === null || configAnthropicKey === undefined) &&
-      anthropicKey.length > 0) ||
-    model !== aiModel;
-
   const xaiKeySaveEnabled =
     (typeof configXaiKey === 'string' && xaiKey !== configXaiKey) ||
-    ((configXaiKey === null || configXaiKey === undefined) && xaiKey.length > 0) ||
-    model !== aiModel;
+    ((configXaiKey === null || configXaiKey === undefined) && xaiKey.length > 0);
 
-  const geminiKeySaveEnabled =
-    (typeof configGeminiKey === 'string' && geminiKey !== configXaiKey) ||
-    ((configGeminiKey === null || configGeminiKey === undefined) && geminiKey.length > 0) ||
-    model !== aiModel;
-
-  const customModelSaveEnabled =
-    (typeof aiBaseUrl === 'string' && baseUrl !== aiBaseUrl) ||
-    ((aiBaseUrl === null || aiBaseUrl === undefined) && baseUrl.length > 0) ||
-    model !== aiModel;
+  useEffect(() => {
+    // Set XAI as default provider on component mount
+    if (aiProvider !== 'Xai') {
+      updateConfigContext({ aiProvider: 'Xai', aiModel: model });
+    }
+  }, []);
 
   return (
     <>
       <div className="flex items-center justify-between w-full mb-2 min-h-10">
-        <div className="flex items-center gap-2">
-          <Select onValueChange={setAiProvider}>
-            <SelectTrigger id="ai-provider-selector" className="w-[180px]">
-              <SelectValue placeholder={aiProvider} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="openai">openai</SelectItem>
-              <SelectItem value="anthropic">anthropic</SelectItem>
-              <SelectItem value="Xai">Xai</SelectItem>
-              <SelectItem value="Gemini">Gemini</SelectItem>
-              <SelectItem value="custom">custom</SelectItem>
-            </SelectContent>
-          </Select>
-          <Input
-            name="aiModel"
-            className="w-[200px]"
-            placeholder="AI model"
-            value={model}
-            onChange={(e) => setModel(e.target.value)}
-          />
-        </div>
+        
         <AiInfoBanner />
       </div>
 
-      {aiProvider === 'openai' && (
-        <div className="flex gap-2">
-          <Input
-            name="openaiKey"
-            placeholder="openAI API key"
-            type="password"
-            value={openaiKey}
-            onChange={(e) => setOpenaiKey(e.target.value)}
-          />
-          <Button
-            className="px-5"
-            onClick={() => updateConfigContext({ openaiKey, aiModel: model })}
-            disabled={!openaiKeySaveEnabled}
-          >
-            {saveButtonLabel ?? 'Save'}
-          </Button>
-        </div>
-      )}
-
-      {aiProvider === 'anthropic' && (
-        <div className="flex gap-2">
-          <Input
-            name="anthropicKey"
-            placeholder="anthropic API key"
-            type="password"
-            value={anthropicKey}
-            onChange={(e) => setAnthropicKey(e.target.value)}
-          />
-          <Button
-            className="px-5"
-            onClick={() => updateConfigContext({ anthropicKey, aiModel: model })}
-            disabled={!anthropicKeySaveEnabled}
-          >
-            {saveButtonLabel ?? 'Save'}
-          </Button>
-        </div>
-      )}
-
-      {aiProvider === 'Xai' && (
-        <div className="flex gap-2">
-          <Input
-            name="xaiKey"
-            placeholder="xai API key"
-            type="password"
-            value={xaiKey}
-            onChange={(e) => setXaiKey(e.target.value)}
-          />
-          <Button
-            className="px-5"
-            onClick={() => updateConfigContext({ xaiKey, aiModel: model })}
-            disabled={!xaiKeySaveEnabled}
-          >
-            {saveButtonLabel ?? 'Save'}
-          </Button>
-        </div>
-      )}
-
-      {aiProvider === 'Gemini' && (
-        <div className="flex gap-2">
-          <Input
-            name="geminiKey"
-            placeholder="Gemini API key"
-            type="password"
-            value={geminiKey}
-            onChange={(e) => setGeminiKey(e.target.value)}
-          />
-          <Button
-            className="px-5"
-            onClick={() => updateConfigContext({ geminiKey, aiModel: model })}
-            disabled={!geminiKeySaveEnabled}
-          >
-            {saveButtonLabel ?? 'Save'}
-          </Button>
-        </div>
-      )}
-
-      {aiProvider === 'custom' && (
-        <div>
-          <p className="opacity-70 text-sm mb-4">
-            If you want to use an openai-compatible model (for example when running local models
-            with Ollama), choose this option and set the baseUrl.
-          </p>
-          <div className="flex gap-2">
-            <Input
-              name="baseUrl"
-              placeholder="http://localhost:11434/v1"
-              value={baseUrl}
-              onChange={(e) => setBaseUrl(e.target.value)}
-            />
-            <Button
-              className="px-5"
-              onClick={() => updateConfigContext({ aiBaseUrl: baseUrl, aiModel: model })}
-              disabled={!customModelSaveEnabled}
-            >
-              {saveButtonLabel ?? 'Save'}
-            </Button>
-          </div>
-        </div>
-      )}
+      <div className="flex gap-2">
+        <Input
+          name="xaiKey"
+          placeholder="xai API key"
+          type="password"
+          value={xaiKey}
+          onChange={(e) => setXaiKey(e.target.value)}
+        />
+        <Button
+          className="px-5"
+          onClick={() => updateConfigContext({ xaiKey, aiModel: model })}
+          disabled={!xaiKeySaveEnabled}
+        >
+          {saveButtonLabel ?? 'Save'}
+        </Button>
+      </div>
     </>
   );
 }

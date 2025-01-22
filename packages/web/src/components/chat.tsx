@@ -86,7 +86,7 @@ function Chat({
   }, [history, loading]);
 
   return (
-    <div className="rounded-lg bg-background w-[440px] border shadow-xl max-h-[75vh]">
+    <div className="rounded-lg bg-sb-core-120 w-[440px] border shadow-xl max-h-[75vh]">
       <div className="flex justify-between h-[40px] items-center border-b px-1">
         <span className="text-sm px-2">👨‍💻 Codelive Assistant</span>
         <span className="flex items-center">
@@ -95,7 +95,7 @@ function Chat({
           </Button>
         </span>
       </div>
-      <div className="max-h-[calc(75vh-40px)] p-2 overflow-y-auto">
+      <div className="max-h-[calc(75vh-40px)] p-2 overflow-y-auto bg-sb-core-120">
         <div className="flex flex-col gap-2">
           {/* TODO: each message object needs a unique identifier */}
           {history.map((message: MessageType, index: number) => {
@@ -211,7 +211,7 @@ function Query({
     <div
       className={cn(
         'rounded-lg w-[440px] border p-2 shadow-xl transition-all',
-        'bg-background hover:border-ai-ring focus-within:border-ai-ring',
+        'bg-sb-core-120 hover:border-ai-ring focus-within:border-ai-ring',
         isLoading && 'hover:border-border',
       )}
     >
