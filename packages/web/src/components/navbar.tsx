@@ -114,7 +114,7 @@ export function Navbar() {
               <img 
                 src="/assets/logo.png" 
                 alt="Codelive" 
-                className="w-48 h-10 transition-transform duration-200 group-hover:scale-105" 
+                className="w-48 h-auto max-h-10 object-contain transition-transform duration-200 group-hover:scale-105" 
               />
               <div className="absolute -inset-1 bg-red-950/20 rounded-lg blur-sm opacity-0 group-hover:opacity-100 transition-all duration-200"></div>
             </div>

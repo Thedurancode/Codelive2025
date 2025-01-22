@@ -30,10 +30,17 @@ function Settings() {
       <div className="space-y-10">
         <div>
           <h2 className="text-base font-medium">Enter Your Codelive Api Key</h2>
-          <div className="flex flex-col">
-            <label className="opacity-70 text-sm pb-3" htmlFor="ai-provider-selector">
-              
-            </label>
+          <div className="flex flex-col gap-3">
+            <div className="flex justify-end">
+              <a 
+                href="https://codelive.ai" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="inline-flex items-center justify-center px-5 py-2.5 bg-green-600 hover:bg-green-500 text-white font-medium rounded-lg transition-all duration-300 shadow-sm hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0"
+              >
+                Subscribe to Codelive
+              </a>
+            </div>
           </div>
           <AiSettings />
         </div>
