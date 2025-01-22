@@ -7,6 +7,8 @@ import {
   ImportIcon,
   TrashIcon,
   ShareIcon,
+  Settings2Icon,
+  InfoIcon
 } from 'lucide-react';
 import { TitleCellType } from '@srcbook/shared';
 
@@ -70,7 +72,7 @@ export function SessionNavbar(props: SessionNavbarProps) {
   }
 
   return (
-    <>
+    <div>
       <GenerateSrcbookModal
         open={showGenSrcbookModal}
         setOpen={setShowGenSrcbookModal}
@@ -80,183 +82,80 @@ export function SessionNavbar(props: SessionNavbarProps) {
       <DeleteSrcbookModal open={showDelete} onOpenChange={setShowDelete} session={props.session} />
       <ExportSrcbookModal open={showSave} onOpenChange={setShowSave} session={props.session} />
 
-      <header className="h-12 w-full flex items-center justify-between fixed bg-background z-50 border-b border-border text-sm font-medium">
-        <nav className="flex items-center justify-between px-4 flex-1">
-          <div className="flex items-center gap-2">
-            <NavLink to="/">
-              <h1 className="font-mono font-bold">
-                Codelive
-              </h1>
-            </NavLink>
-
-            <span className="select-none">/</span>
-
-            {srcbooks.length < 2 ? (
-              <span className="px-1.5">{props.title}</span>
-            ) : (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="icon" className="font-normal px-1.5 active:translate-y-0">
-                    <div className="flex items-center gap-1 font-medium">
-                      {props.title}
-                      <ChevronDownIcon size={12} />
-                    </div>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="w-56">
-                  {srcbooks.map((srcbook) => {
-                    if (srcbook.id === props.session.id) {
-                      return null;
-                    }
-                    const titleCell = srcbook.cells.find((cell) => cell.type === 'title') as
-                      | TitleCellType
-                      | undefined;
-                    if (!titleCell) {
-                      return null;
-                    }
-
-                    return (
-                      <DropdownMenuItem
-                        key={srcbook.id}
-                        onClick={() => navigate(`/srcbooks/${srcbook.id}`)}
-                        className="cursor-pointer"
-                      >
-                        {titleCell.text}
-                      </DropdownMenuItem>
-                    );
-                  })}
-
-                  {props.srcbooks.length > 6 ? (
-                    <DropdownMenuItem asChild className="cursor-pointer border-t mt-2 pt-2">
-                      <Link to="/">See all</Link>
-                    </DropdownMenuItem>
-                  ) : null}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
-
-            {!props.readOnly ? (
-              <>
-                <div className="w-[1px] h-5 bg-border" />
-
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="icon" className="w-8 h-8 p-0 active:translate-y-0">
-                      <PlusIcon size={18} />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" className="w-56">
-                    <DropdownMenuItem onClick={onCreateSrcbook} className="cursor-pointer">
-                      <PlusIcon className="mr-2 h-4 w-4" />
-                      <span>Create Srcbook</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => {
-                        setTimeout(() => {
-                          setShowGenSrcbookModal(true);
-                        }, 0);
-                      }}
-                      className="cursor-pointer"
-                    >
-                      <SparklesIcon className="mr-2 h-4 w-4" />
-                      <span>Generate Srcbook</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => {
-                        setTimeout(() => {
-                          setShowImportSrcbookModal(true);
-                        }, 0);
-                      }}
-                      className="cursor-pointer"
-                    >
-                      <ImportIcon className="mr-2 h-4 w-4" />
-                      <span>Open Notebook</span>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </>
-            ) : null}
-          </div>
-
-          <LightDarkModeDebugChanger />
-
-          <div className="flex items-center gap-2">
-            {!props.readOnly ? (
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="icon"
-                      size="icon"
-                      onClick={() => setShowDelete(true)}
-                      className="active:translate-y-0"
-                    >
-                      <TrashIcon size={18} />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Delete this Srcbook</TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            ) : null}
-            <Button
-              variant="secondary"
-              onClick={() => setShowSave(true)}
-              className="active:translate-y-0"
-            >
-              <div className="flex gap-2">
-                <ShareIcon size={16} />
-                Share
+      <header className="h-24 w-full fixed bg-gradient-to-r from-blue-900 to-blue-800 z-50">
+        <nav className="max-w-7xl mx-auto h-full flex items-start">
+          <div className="pt-2 pl-4">
+            <NavLink to="/" className="flex items-center space-x-6 group">
+              <div className="relative">
+                <img 
+                  src="/assets/logo.png" 
+                  alt="Codelive" 
+                  className="w-60 h-16 transition-transform duration-200 group-hover:scale-105" 
+                />
+                <div className="absolute -inset-1 bg-blue-400/20 rounded-lg blur-md group-hover:bg-blue-400/30 transition-all duration-200"></div>
               </div>
-            </Button>
+              <span className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-blue-100">
+                Codelive
+              </span>
+            </NavLink>
           </div>
         </nav>
       </header>
-    </>
+    </div>
   );
 }
 
 export function Navbar() {
   return (
-    <header className="h-12 w-full flex items-center justify-between fixed bg-background z-50 border-b border-border text-sm">
-      <nav className="flex items-center justify-between px-4 flex-1">
-        <div className="flex items-center gap-6">
-          <NavLink to="/">
-            <h1 className="font-mono font-bold">
-              Codelive
-            </h1>
+    <header className="h-20 w-full flex items-center justify-between fixed bg-black z-50 border-b border-border/20">
+      <nav className="w-full flex items-center justify-between px-8">
+        <div className="flex-1">
+          <NavLink to="/" className="flex items-center group">
+            <div className="relative">
+              <img 
+                src="/assets/logo.png" 
+                alt="Codelive" 
+                className="w-44 h-12 transition-transform duration-200 group-hover:scale-105" 
+              />
+              <div className="absolute -inset-1 bg-blue-500/10 rounded-lg blur-sm opacity-0 group-hover:opacity-100 transition-all duration-200"></div>
+            </div>
           </NavLink>
+        </div>
 
-          <ul className="flex items-center gap-6">
-            <li>
-              <NavLink
-                to="/secrets"
-                className="font-semibold text-tertiary-foreground visited:text-tertiary-foreground hover:text-foreground transition-colors"
-              >
-                Secrets
-              </NavLink>
-            </li>
+        <div className="flex-1 flex justify-center">
+          <ul className="flex items-center gap-12">
             <li>
               <NavLink
                 to="/settings"
-                className="font-semibold text-tertiary-foreground visited:text-tertiary-foreground hover:text-foreground transition-colors"
+                className={({ isActive }) => 
+                  `group flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 hover:bg-blue-500/10 ${
+                    isActive ? 'text-blue-400 bg-blue-500/5' : 'text-gray-300'
+                  }`
+                }
               >
-                Settings
+                <Settings2Icon className="w-5 h-5 transition-transform duration-200 group-hover:rotate-45" />
+                <span className="text-lg font-semibold">Settings</span>
               </NavLink>
             </li>
             <li>
               <NavLink
                 to="/about"
-                className="font-semibold text-tertiary-foreground visited:text-tertiary-foreground hover:text-foreground transition-colors"
+                className={({ isActive }) => 
+                  `group flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 hover:bg-blue-500/10 ${
+                    isActive ? 'text-blue-400 bg-blue-500/5' : 'text-gray-300'
+                  }`
+                }
               >
-                About
+                <InfoIcon className="w-5 h-5 transition-transform duration-200 group-hover:scale-110" />
+                <span className="text-lg font-semibold">About</span>
               </NavLink>
             </li>
           </ul>
         </div>
 
-        <LightDarkModeDebugChanger />
-
-        <div className="flex items-center gap-2"></div>
+        <div className="flex-1 flex justify-end">
+          <LightDarkModeDebugChanger />
+        </div>
       </nav>
     </header>
   );

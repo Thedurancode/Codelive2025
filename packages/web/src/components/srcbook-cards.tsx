@@ -114,11 +114,11 @@ export function CardContainer({
       {...props}
       onClick={onClick}
       className={cn(
-        'group border relative rounded-md h-[92px] overflow-clip cursor-pointer transition-colors text-sm',
+        'group border relative rounded-md h-[140px] overflow-hidden cursor-pointer transition-colors text-sm',
         className,
       )}
     >
-      <div className="px-4 py-3 h-full flex flex-col justify-between">{children}</div>
+      {children}
     </div>
   );
 }
@@ -177,6 +177,7 @@ export function SrcbookCard(props: SrcbookCardPropsType) {
 
 type AppCardPropsType = {
   name: string;
+  updatedAt: number;
   onClick: () => void;
   onDelete: () => void;
 };
@@ -190,24 +191,57 @@ export function AppCard(props: AppCardPropsType) {
   return (
     <CardContainer
       onClick={props.onClick}
-      className="active:translate-y-0.5 hover:border-foreground"
+      className="group relative bg-gradient-to-br from-background to-muted hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border hover:border-blue-500/20 active:translate-y-0 h-[140px] overflow-hidden"
     >
-      <span className="flex items-center">
-        <LayoutGrid size={20} className="mr-2 text-sb-purple-60" />
-        <h5 className="font-medium leading-[18px] line-clamp-2">{props.name}</h5>
-      </span>
-      <div className="flex justify-end">
-        <code className="font-mono group-hover:hidden text-tertiary-foreground">TS</code>
-        <button
-          type="button"
-          onClick={onDelete}
-          className="hidden group-hover:block hover:text-foreground"
-        >
-          <Trash2 size={16} />
-        </button>
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-500/[0.02] to-purple-500/[0.02] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-blue-500/30 to-purple-500/30 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
+      
+      <div className="flex flex-col h-full p-5 relative">
+        <div className="flex-1">
+          <h3 className="font-semibold text-lg leading-tight line-clamp-2 group-hover:text-blue-500/90 transition-colors duration-300">
+            {props.name}
+          </h3>
+        </div>
+
+        <div className="flex items-end justify-between pt-2">
+          <div className="flex flex-col gap-0.5">
+            <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground/70">
+              Last edited
+            </span>
+            <span className="text-sm text-muted-foreground">
+              {formatTimeAgo(props.updatedAt)}
+            </span>
+          </div>
+          
+          <button
+            type="button"
+            onClick={onDelete}
+            className="p-1.5 rounded-md hover:bg-red-500/10 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
+          >
+            <Trash2 size={14} />
+          </button>
+        </div>
       </div>
     </CardContainer>
   );
+}
+
+function formatTimeAgo(timestamp: number): string {
+  const now = Math.floor(Date.now() / 1000);
+  const diff = now - timestamp;
+
+  if (diff < 60) {
+    return 'just now';
+  } else if (diff < 3600) {
+    const minutes = Math.floor(diff / 60);
+    return `${minutes}m ago`;
+  } else if (diff < 86400) {
+    const hours = Math.floor(diff / 3600);
+    return `${hours}h ago`;
+  } else {
+    const days = Math.floor(diff / 86400);
+    return `${days}d ago`;
+  }
 }
 
 export function GenerateSrcbookButton(props: { onClick: () => void }) {
@@ -274,15 +308,18 @@ export function CreateAppButton(props: { defaultLanguage: CodeLanguageType; onCl
   return (
     <CardContainer
       onClick={() => props.onClick()}
-      className="active:translate-y-0.5 bg-[#F6EEFB80] dark:bg-[#331F4780] border-sb-purple-20 dark:border-sb-purple-80 hover:border-sb-purple-60 text-sb-purple-70 dark:text-sb-purple-20"
+      className="group relative bg-gradient-to-br from-emerald-500/[0.03] to-emerald-600/[0.03] hover:from-emerald-500/[0.05] hover:to-emerald-600/[0.05] border-emerald-600/20 hover:border-emerald-500/30 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 active:translate-y-0"
     >
-      <div className="flex flex-col h-full items-start justify-between">
-        <PlusIcon size={20} />
-        <div className="flex items-center">
-          <h5 className="font-medium leading-[18px] mr-2">Create Project</h5>
-          <span className="flex items-center justify-center h-[16px] px-2 rounded-lg text-sb-purple-60 dark:text-sb-purple-20 bg-sb-core-0 dark:bg-sb-core-100">
-            New
-          </span>
+      <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-emerald-500/40 to-emerald-600/40 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
+      
+      <div className="flex items-center justify-center h-full">
+        <div className="flex items-center gap-2.5">
+          <div className="p-2 rounded-md bg-emerald-500/10 text-emerald-500">
+            <PlusIcon size={18} className="transition-transform duration-300 group-hover:rotate-90" />
+          </div>
+          <h3 className="font-semibold text-lg whitespace-nowrap text-emerald-700/80 dark:text-emerald-400/90 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors duration-300">
+            New project
+          </h3>
         </div>
       </div>
     </CardContainer>

@@ -1,0 +1,45 @@
+{
+  "name": "Srcbook Development Container",
+  "dockerComposeFile": "../docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/workspace",
+  
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "streetsidesoftware.code-spell-checker",
+        "mikestead.dotenv",
+        "eamodio.gitlens",
+        "ms-vscode.vscode-typescript-next"
+      ]
+    }
+  },
+
+  "postCreateCommand": "pnpm install",
+  
+  "remoteUser": "node",
+  
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {
+      "version": "latest",
+      "moby": true
+    },
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "20",
+      "nodePackageManager": "pnpm"
+    }
+  },
+
+  "forwardPorts": [3000, 3001, 2150],
+
+  "mounts": [
+    "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
+  ],
+
+  "containerEnv": {
+    "NODE_ENV": "development",
+    "CI": "true"
+  }
+}

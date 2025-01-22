@@ -1,0 +1,78 @@
+name: Build, Test and Deploy
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      # Setup dev container
+      - name: Set up dev container
+        uses: devcontainers/ci@v0.3
+        with:
+          devcontainer-path: .devcontainer/devcontainer.json
+          cache-key: devcontainer-${{ github.sha }}
+          cache-paths: |
+            /workspace/node_modules
+            /root/.npm
+
+      # Run tests in dev container
+      - name: Run tests
+        run: pnpm test
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      - run: pnpm install
+      - run: pnpm build
+
+  deploy:
+    needs: [test, build]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}:latest
+            ghcr.io/${{ github.repository }}:${{ github.sha }}
+
+      - name: Setup Fly.io CLI
+        uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Deploy to Fly.io
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+        run: flyctl deploy --remote-only
+
+      - name: Verify deployment
+        run: |
+          echo "Successfully deployed to GitHub Container Registry and Fly.io"
+          echo "Image tags:"
+          echo "- ghcr.io/${{ github.repository }}:latest"
+          echo "- ghcr.io/${{ github.repository }}:${{ github.sha }}"
+          echo ""
+          echo "Application is deployed at: https://codelive2025.fly.dev"
