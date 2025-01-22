@@ -125,6 +125,18 @@ export function Navbar() {
           <ul className="flex items-center gap-12">
             <li>
               <NavLink
+                to="/pricing"
+                className={({ isActive }) => 
+                  `group flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 hover:bg-red-950/20 ${
+                    isActive ? 'text-red-700 bg-red-950/10' : 'text-gray-300'
+                  }`
+                }
+              >
+                <span className="text-lg font-semibold">Pricing</span>
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
                 to="/settings"
                 className={({ isActive }) => 
                   `group flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 hover:bg-red-950/20 ${

@@ -21,6 +21,7 @@ const Session = lazy(() => import('./routes/session').then(m => ({ default: m.de
 const Settings = lazy(() => import('./routes/settings').then(m => ({ default: m.default })));
 const Secrets = lazy(() => import('./routes/secrets').then(m => ({ default: m.default })));
 const About = lazy(() => import('./routes/about').then(m => ({ default: m.default })));
+const Pricing = lazy(() => import('./routes/pricing').then(m => ({ default: m.default })));
 const ErrorPage = lazy(() => import('./error').then(m => ({ default: m.default })));
 
 // Loaders
@@ -140,6 +141,19 @@ const router = createBrowserRouter([
             element: (
               <Suspense fallback={<div className="min-h-screen bg-background" />}>
                 <Secrets />
+              </Suspense>
+            ),
+            errorElement: (
+              <Suspense fallback={<div className="min-h-screen bg-background" />}>
+                <ErrorPage />
+              </Suspense>
+            ),
+          },
+          {
+            path: '/pricing',
+            element: (
+              <Suspense fallback={<div className="min-h-screen bg-background" />}>
+                <Pricing />
               </Suspense>
             ),
             errorElement: (
