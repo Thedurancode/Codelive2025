@@ -50,7 +50,7 @@ export default function program() {
 
   program
     .command('start')
-    .description('Start the Srcbook server')
+    .description('Start Codelive Server')
     .option('-p, --port <port>', 'Port to run the server on', '2150')
     .action(({ port }) => {
       startServer(port, () => {
@@ -62,7 +62,7 @@ export default function program() {
     .command('import')
     .description('Import a Srcbook')
     .option('-p, --port <port>', 'Port of the server', '2150')
-    .argument('<specifier>', 'An identifier of a Srcbook on hub.srcbook.com')
+    .argument('<specifier>', 'A Codelive Production')
     .action(async (specifier, { port }) => {
       const portAvailable = await isPortAvailable('localhost', port);
 

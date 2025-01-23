@@ -1,5 +1,5 @@
 /**
- * Run the Srcbook application.
+ 
  *
  * For this, we need to:
  *  - Serve the API

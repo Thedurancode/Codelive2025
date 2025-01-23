@@ -3,7 +3,6 @@ import useTheme from '@srcbook/components/src/components/use-theme';
 
 import {
   ChevronsLeftIcon,
-  FlagIcon,
   FolderTreeIcon,
   KeyboardIcon,
   MoonIcon,
@@ -18,7 +17,6 @@ import {
   TooltipTrigger,
 } from '@srcbook/components/src/components/ui/tooltip';
 import KeyboardShortcutsDialog from '../keyboard-shortcuts-dialog';
-import FeedbackDialog from '../feedback-dialog';
 import { cn } from '@/lib/utils';
 import ExplorerPanel from './panels/explorer';
 import PackagesPanel from './panels/settings';
@@ -47,7 +45,6 @@ export default function Sidebar({ initialPanel }: SidebarProps) {
   const { status } = usePackageJson();
   const [panel, _setPanel] = useState<PanelType | null>(initialPanel);
   const [showShortcuts, setShowShortcuts] = useState(false);
-  const [showFeedback, setShowFeedback] = useState(false);
 
   function setPanel(nextPanel: PanelType) {
     _setPanel(nextPanel === panel ? null : nextPanel);
@@ -56,12 +53,11 @@ export default function Sidebar({ initialPanel }: SidebarProps) {
   return (
     <>
       <KeyboardShortcutsDialog open={showShortcuts} onOpenChange={setShowShortcuts} />
-      <FeedbackDialog open={showFeedback} onOpenChange={setShowFeedback} />
 
       <div className="flex h-full border-r border-border">
         <div className="flex flex-col items-center justify-between w-12 h-full py-3 bg-muted z-10">
           <div className="flex flex-col items-center w-full gap-2">
-            <NavItemWithTooltip tooltipContent="Explorer" onClick={() => setPanel('explorer')}>
+            <NavItemWithTooltip tooltipContent="Codebase" onClick={() => setPanel('explorer')}>
               <FolderTreeIcon
                 size={18}
                 className={cn(
@@ -108,15 +104,6 @@ export default function Sidebar({ initialPanel }: SidebarProps) {
               onClick={() => setShowShortcuts(true)}
             >
               <KeyboardIcon
-                size={18}
-                className="text-tertiary-foreground hover:text-secondary-foreground transition-colors"
-              />
-            </NavItemWithTooltip>
-            <NavItemWithTooltip
-              tooltipContent="Leave feedback"
-              onClick={() => setShowFeedback(true)}
-            >
-              <FlagIcon
                 size={18}
                 className="text-tertiary-foreground hover:text-secondary-foreground transition-colors"
               />

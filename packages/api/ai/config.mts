@@ -40,7 +40,7 @@ export async function getModel(): Promise<LanguageModel> {
 
     case 'Xai':
       if (!config.xaiKey) {
-        throw new Error('Xai API key is not set');
+        throw new Error('API key is not set');
       }
       const xai = createOpenAI({
         compatibility: 'compatible',

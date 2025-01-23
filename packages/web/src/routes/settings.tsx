@@ -29,7 +29,7 @@ function Settings() {
       <h4 className="h4 mx-auto mb-6">Settings</h4>
       <div className="space-y-10">
         <div>
-          <h2 className="text-base font-medium">Enter Your Codelive Api Key</h2>
+          
           <div className="flex flex-col gap-3">
             <div className="flex justify-end">
               <a 
@@ -202,7 +202,7 @@ export function AiSettings({ saveButtonLabel }: AiSettingsProps) {
       <div className="flex gap-2">
         <Input
           name="xaiKey"
-          placeholder="xai API key"
+          placeholder="Enter Your Codelive API Key"
           type="password"
           value={xaiKey}
           onChange={(e) => setXaiKey(e.target.value)}

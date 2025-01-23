@@ -9,6 +9,7 @@ import {
   PanelBottomOpenIcon,
   PanelBottomCloseIcon,
   ExternalLinkIcon,
+  HomeIcon,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { SrcbookLogo } from '@/components/logos';
@@ -108,7 +109,7 @@ export default function EditorHeader(props: PropsType) {
         )}
       >
         <Link to="/" className="px-4" title="Home">
-          <SrcbookLogo size={20} />
+          <HomeIcon size={20} />
         </Link>
         <nav className="flex items-center justify-between px-2 flex-1">
           <div className="flex items-center gap-2">

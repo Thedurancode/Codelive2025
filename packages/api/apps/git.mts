@@ -26,7 +26,7 @@ export async function commitAllFiles(app: DBAppType, message: string): Promise<s
 
   // Create commit
   await git.commit(message, {
-    '--author': 'Srcbook <ai@srcbook.com>',
+    '--author': 'CodeLive <ai@codelive.ai>',
   });
 
   // Get the exact SHA of the new commit. Sometimes it's 'HEAD <sha>' for some reason

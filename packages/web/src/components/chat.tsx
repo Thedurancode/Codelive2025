@@ -171,8 +171,8 @@ function Chat({
               <Loader size={18} className="animate-spin text-ai-btn" />{' '}
               <p className="text-xs">
                 {loading === 'description'
-                  ? 'We are generating a plan...'
-                  : 'Coding your changes (this can take a bit)...'}
+                  ? 'Let me think about this...'
+                  : 'Coding your changes now..'}
               </p>
             </div>
           )}
@@ -316,9 +316,6 @@ function DiffBox({
                     <DropdownMenuItem onClick={() => checkout(version)}>
                       Revert to this version
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => alert('Coming soon!')}>
-                      Fork this version
-                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
@@ -338,7 +335,7 @@ function DiffBox({
           </div>
         </div>
       </div>
-      <div className="flex px-2 items-center gap-2 my-2">
+      <div className="flex px-2 items-center gap-2 my-2 hidden">
         <Button
           variant="icon"
           className={cn(

@@ -2,8 +2,10 @@ import { PostHog } from 'posthog-node';
 import { getConfig } from './config.mjs';
 import { IS_PRODUCTION } from './constants.mjs';
 
-const POSTHOG_API_KEY = 'phc_bQjmPYXmbl76j8gW289Qj9XILuu1STRnIfgCSKlxdgu';
-const POSTHOG_HOST = 'https://us.i.posthog.com';
+const client = new PostHog(
+  'phc_Hmyy7jBw4ckBGWz8JNaXSZF231JBNrzCRiRAVNK4Y8e',
+  { host: 'https://us.i.posthog.com' }
+);
 
 type EventType = {
   event: string;
@@ -12,11 +14,9 @@ type EventType = {
 
 class PostHogClient {
   private installId: string;
-  private client: PostHog;
 
   constructor(config: { installId: string }) {
     this.installId = config.installId;
-    this.client = new PostHog(POSTHOG_API_KEY, { host: POSTHOG_HOST });
   }
 
   private get analyticsEnabled(): boolean {
@@ -33,11 +33,11 @@ class PostHogClient {
       return;
     }
 
-    this.client.capture({ ...event, distinctId: this.installId });
+    client.capture({ ...event, distinctId: this.installId });
   }
 
   public shutdown() {
-    this.client.shutdown();
+    client.shutdown();
   }
 }
 
