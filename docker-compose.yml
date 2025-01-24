@@ -1,7 +1,7 @@
 version: '3'
 services:
   srcbook:
-    build:
+    build: 
       context: .
       dockerfile: Dockerfile
     ports:
