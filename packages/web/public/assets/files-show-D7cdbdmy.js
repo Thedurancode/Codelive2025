@@ -1,0 +1,1 @@
+import{j as o}from"./index-CzQ-6GRY.js";import{e as a}from"./use-version-OEqN3Viw.js";import{A as s,C as p}from"./layout-Ds1nrRM2.js";function c(){const{openedFile:e,updateFile:t}=a();return o.jsx(s,{activeTab:"code",activePanel:"explorer",children:e&&o.jsx(p,{path:e.path,source:e.source,onChange:r=>t({...e,source:r})})})}export{c as default};
