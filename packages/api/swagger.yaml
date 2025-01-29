@@ -1,0 +1,411 @@
+openapi: 3.0.0
+info:
+  title: CodeLive API
+  version: '1.0'
+  description: |
+    API for managing CodeLive applications, files, and directories.
+    Provides functionality for creating, updating, and managing code projects.
+  contact:
+    name: CodeLive Support
+    url: https://codelive.ai/support
+
+servers:
+  - url: http://localhost:2150/api
+    description: Local development
+  - url: https://api.codelive.ai/api
+    description: Production server
+
+components:
+  schemas:
+    App:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the app
+        name:
+          type: string
+          description: Name of the app
+        createdAt:
+          type: integer
+          description: Unix timestamp of creation time
+        updatedAt:
+          type: integer
+          description: Unix timestamp of last update
+
+    File:
+      type: object
+      properties:
+        path:
+          type: string
+          description: File path relative to app root
+        name:
+          type: string
+          description: File name
+        source:
+          type: string
+          description: File content
+        binary:
+          type: boolean
+          description: Whether the file is binary
+
+    Directory:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [directory]
+        path:
+          type: string
+        dirname:
+          type: string
+        basename:
+          type: string
+        children:
+          type: array
+          items:
+            oneOf:
+              - $ref: '#/components/schemas/File'
+              - $ref: '#/components/schemas/Directory'
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+
+paths:
+  /apps:
+    get:
+      summary: List all apps
+      parameters:
+        - name: sort
+          in: query
+          schema:
+            type: string
+            enum: [asc, desc]
+          description: Sort order for apps
+      responses:
+        '200':
+          description: List of apps
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/App'
+    
+    post:
+      summary: Create a new app
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Name of the app
+                prompt:
+                  type: string
+                  description: Optional AI prompt for app generation
+      responses:
+        '200':
+          description: Created app
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/App'
+        '400':
+          description: Invalid request body
+
+  /apps/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    
+    get:
+      summary: Get app details
+      responses:
+        '200':
+          description: App details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/App'
+        '404':
+          description: App not found
+    
+    put:
+      summary: Update app
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+      responses:
+        '200':
+          description: Updated app
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/App'
+        '404':
+          description: App not found
+    
+    delete:
+      summary: Delete app
+      responses:
+        '200':
+          description: App deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  deleted:
+                    type: boolean
+
+  /apps/{id}/files:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    
+    get:
+      summary: Get file content
+      parameters:
+        - name: path
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: File content
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/File'
+    
+    post:
+      summary: Create file
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                dirname:
+                  type: string
+                basename:
+                  type: string
+                source:
+                  type: string
+      responses:
+        '200':
+          description: Created file
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/File'
+    
+    delete:
+      summary: Delete file
+      parameters:
+        - name: path
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: File deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      deleted:
+                        type: boolean
+
+  /apps/{id}/directories:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    
+    get:
+      summary: List directory contents
+      parameters:
+        - name: path
+          in: query
+          schema:
+            type: string
+            default: '.'
+      responses:
+        '200':
+          description: Directory contents
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Directory'
+    
+    post:
+      summary: Create directory
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                dirname:
+                  type: string
+                basename:
+                  type: string
+      responses:
+        '200':
+          description: Created directory
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Directory'
+
+  /apps/{id}/commit:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    
+    get:
+      summary: Get current commit
+      responses:
+        '200':
+          description: Current commit SHA
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sha:
+                    type: string
+    
+    post:
+      summary: Create commit
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+      responses:
+        '200':
+          description: Created commit
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sha:
+                    type: string
+
+  /apps/{id}/checkout/{sha}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: sha
+        in: path
+        required: true
+        schema:
+          type: string
+    
+    post:
+      summary: Checkout commit
+      responses:
+        '200':
+          description: Checked out commit
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  sha:
+                    type: string
+
+  /apps/{id}/export:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    
+    post:
+      summary: Export app as ZIP
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+      responses:
+        '200':
+          description: ZIP file
+          content:
+            application/zip:
+              schema:
+                type: string
+                format: binary 

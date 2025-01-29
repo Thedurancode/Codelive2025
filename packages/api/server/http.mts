@@ -64,12 +64,16 @@ import { AppGenerationFeedbackType } from '@srcbook/shared';
 import { createZipFromApp } from '../apps/disk.mjs';
 import { checkoutCommit, commitAllFiles, getCurrentCommitSha } from '../apps/git.mjs';
 import { streamJsonResponse } from './utils.mjs';
+import swaggerRouter from './swagger.mjs';
 
 const app: Application = express();
 
 const router = express.Router();
 
 router.use(express.json());
+
+// Mount Swagger UI
+router.use('/docs', swaggerRouter);
 
 router.options('/file', cors());
 

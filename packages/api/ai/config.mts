@@ -53,10 +53,13 @@ export async function getModel(): Promise<LanguageModel> {
       if (typeof aiBaseUrl !== 'string') {
         throw new Error('Local AI base URL is not set');
       }
+      if (!config.openaiKey) {
+        throw new Error('OpenRouter API key is not set');
+      }
       const openaiCompatible = createOpenAI({
         compatibility: 'compatible',
-        apiKey: 'bogus', // required but unused
-        baseURL: aiBaseUrl,
+        apiKey: config.openaiKey,
+        baseURL: aiBaseUrl
       });
       return openaiCompatible(model);
   }
