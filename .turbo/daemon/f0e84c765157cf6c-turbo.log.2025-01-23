@@ -72,3 +72,17 @@
 2025-01-23T13:14:38.112622Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
 2025-01-23T13:14:47.362806Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("packages/web/src/components/apps/header.tsx")}
 2025-01-23T13:14:47.362827Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@srcbook/web"), path: AnchoredSystemPathBuf("packages/web") }}))
+2025-01-23T13:14:57.261707Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("srcbook/src/cli.mts"), AnchoredSystemPathBuf("srcbook/src/server.mts")}
+2025-01-23T13:14:57.261721Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("srcbook"), path: AnchoredSystemPathBuf("srcbook") }}))
+2025-01-23T14:25:08.862876Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("packages/web/src/components/CreateNewProject.tsx")}
+2025-01-23T14:25:08.864350Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@srcbook/web"), path: AnchoredSystemPathBuf("packages/web") }}))
+2025-01-23T14:25:29.519826Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("packages/web/src/components/CreateNewProject.tsx")}
+2025-01-23T14:25:29.519926Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@srcbook/web"), path: AnchoredSystemPathBuf("packages/web") }}))
+2025-01-23T14:25:49.920180Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("packages/web/src/components/CreateNewProject.tsx")}
+2025-01-23T14:25:49.920209Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@srcbook/web"), path: AnchoredSystemPathBuf("packages/web") }}))
+2025-01-23T14:27:35.328779Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("packages/web/src/components/CreateNewProject.tsx")}
+2025-01-23T14:27:35.330025Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@srcbook/web"), path: AnchoredSystemPathBuf("packages/web") }}))
+2025-01-23T14:28:01.735819Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("packages/web/src/components/CreateNewProject.tsx")}
+2025-01-23T14:28:01.737959Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@srcbook/web"), path: AnchoredSystemPathBuf("packages/web") }}))
+2025-01-23T14:32:14.807124Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("packages/web/src/components/CreateNewProject.tsx")}
+2025-01-23T14:32:14.810386Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@srcbook/web"), path: AnchoredSystemPathBuf("packages/web") }}))
