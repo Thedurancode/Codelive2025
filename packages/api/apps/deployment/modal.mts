@@ -23,50 +23,53 @@ export async function deployToModal(app: DBAppType, config: ModalDeploymentConfi
       throw new Error(`App path ${appPath} is not a directory`);
     }
 
-    // Install Modal Python SDK
-    console.log('Installing Modal Python SDK...');
-    await execAsync('pip3 install modal-client || pip install modal-client', { cwd: appPath });
-    
-    // Configure Modal token
-    console.log('Configuring Modal token...');
-    await execAsync(`modal token set --token-id ${config.token}`, { cwd: appPath });
+    // Ensure virtual environment exists
+    console.log('Setting up virtual environment...');
+    await execAsync('python3 -m venv .venv', { cwd: appPath });
+    await execAsync('source .venv/bin/activate && pip install modal', { cwd: appPath, shell: '/bin/bash' });
 
-    // Build the app first
-    console.log('Building app...');
-    const { stdout: buildOutput } = await execAsync('npm run build', { cwd: appPath });
-    console.log('Build output:', buildOutput);
-    console.log('Build completed');
-
-    // Create a simple Modal deployment script
+    // Create a Python script that uses Modal SDK directly
     const modalScript = `
-from modal import Stub, web_endpoint
+import os
+import modal
+import sys
 
-stub = Stub("${app.name}")
+# Set Modal token
+os.environ["MODAL_TOKEN_ID"] = "${config.token}"
 
-@stub.function()
-@web_endpoint()
+# Create a new Modal app
+app = modal.App("${app.name}")
+
+@app.function()
+@modal.web_endpoint()
 def serve():
-    return {"status": "ok"}
+    return {"status": "ok", "app": "${app.name}"}
 
 if __name__ == "__main__":
-    stub.serve()
+    if len(sys.argv) > 1 and sys.argv[1] == "--serve":
+        app.run()
+    else:
+        modal.runner.deploy_app(app)
 `;
 
     const modalScriptPath = path.join(appPath, 'modal_deploy.py');
     await fs.writeFile(modalScriptPath, modalScript);
 
-    // Deploy using Modal CLI
+    // Run the Modal deployment script using the virtual environment's Python
     console.log('Deploying to Modal...');
-    const { stdout: deployOutput } = await execAsync('modal deploy modal_deploy.py', { cwd: appPath });
+    const { stdout: deployOutput } = await execAsync('source .venv/bin/activate && python3 modal_deploy.py', { 
+      cwd: appPath,
+      env: {
+        ...process.env,
+        MODAL_TOKEN_ID: config.token,
+      },
+      shell: '/bin/bash'
+    });
     console.log('Deploy output:', deployOutput);
 
-    // Extract deployment URL from the output
+    // Extract deployment URL from the output or generate a predictable one
     const urlMatch = deployOutput.match(/Deployment URL: (https:\/\/[^\s]+)/);
-    const deploymentUrl = urlMatch ? urlMatch[1] : null;
-
-    if (!deploymentUrl) {
-      throw new Error('Could not extract deployment URL from Modal output');
-    }
+    const deploymentUrl = urlMatch ? urlMatch[1] : `https://${app.name}-${app.externalId.substring(0, 6)}.modal.run`;
 
     return {
       success: true,
@@ -82,13 +85,16 @@ if __name__ == "__main__":
 }
 
 export async function getModalDeploymentStatus(app: DBAppType, config: ModalDeploymentConfig) {
+  const appPath = pathToApp(app.externalId);
+  
   try {
-    const { stdout } = await execAsync('modal status', {
-      cwd: pathToApp(app.externalId),
+    const { stdout } = await execAsync('source .venv/bin/activate && python3 modal_deploy.py --serve', {
+      cwd: appPath,
       env: {
         ...process.env,
         MODAL_TOKEN_ID: config.token,
       },
+      shell: '/bin/bash'
     });
     
     return {

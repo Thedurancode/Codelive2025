@@ -3,17 +3,58 @@ info:
   title: CodeLive API
   version: '1.0'
   description: |
-    API for managing CodeLive applications, files, and directories.
-    Provides functionality for creating, updating, and managing code projects.
+    # CodeLive API Documentation
+    
+    Welcome to the CodeLive API - your gateway to programmatically managing and enhancing your applications. This API provides powerful features for code generation, management, and analysis.
+
+    ## Key Features
+    - 🤖 AI-Powered Code Generation
+    - 📁 File & Directory Management
+    - 🔍 Code Search & Analysis
+    - 📦 Dependency Management
+    - 🛠️ Code Linting & Fixes
+    - 📊 App Statistics
+
+    ## Getting Started
+    1. Create an app using POST /apps
+    2. Use the app ID in subsequent requests
+    3. Explore the various endpoints to manage your code
+
+    ## Authentication
+    Currently using session-based authentication. API key authentication coming soon.
+
+    ## Rate Limiting
+    - 100 requests per minute for regular endpoints
+    - 20 requests per minute for AI-powered endpoints
+
   contact:
     name: CodeLive Support
     url: https://codelive.ai/support
+    email: support@codelive.ai
+
+  x-logo:
+    url: 'https://codelive.ai/logo.png'
+    altText: CodeLive Logo
 
 servers:
   - url: http://localhost:2150/api
     description: Local development
   - url: https://api.codelive.ai/api
     description: Production server
+
+tags:
+  - name: Apps
+    description: Core app management endpoints
+  - name: Files
+    description: File and directory operations
+  - name: AI
+    description: AI-powered code generation and modifications
+  - name: Analysis
+    description: Code analysis and statistics
+  - name: Dependencies
+    description: Package dependency management
+  - name: Code Execution
+    description: Code execution and sandbox environment
 
 components:
   schemas:
@@ -72,10 +113,79 @@ components:
     BearerAuth:
       type: http
       scheme: bearer
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
 
 paths:
+  /apps/{id}/prompt:
+    tags:
+      - AI
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: ID of the app to modify
+    post:
+      tags:
+        - AI
+      summary: Send AI prompt
+      description: Send a natural language prompt to modify the app using AI
+      operationId: promptApp
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - query
+              properties:
+                query:
+                  type: string
+                  description: The natural language prompt describing desired changes
+                  example: "add a dark mode toggle"
+      responses:
+        '200':
+          description: Successful response with planned changes
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  plan:
+                    type: object
+                    properties:
+                      description:
+                        type: string
+                      actions:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            type:
+                              type: string
+                              enum: [file, command]
+                            path:
+                              type: string
+                            content:
+                              type: string
+        '400':
+          description: Invalid request or missing query
+        '404':
+          description: App not found
+        '500':
+          description: Server error or AI processing failed
+
   /apps:
     get:
+      tags:
+        - Apps
       summary: List all apps
       parameters:
         - name: sort
@@ -98,6 +208,8 @@ paths:
                       $ref: '#/components/schemas/App'
     
     post:
+      tags:
+        - Apps
       summary: Create a new app
       requestBody:
         required: true
@@ -134,6 +246,8 @@ paths:
           type: string
     
     get:
+      tags:
+        - Apps
       summary: Get app details
       responses:
         '200':
@@ -149,6 +263,8 @@ paths:
           description: App not found
     
     put:
+      tags:
+        - Apps
       summary: Update app
       requestBody:
         required: true
@@ -173,6 +289,8 @@ paths:
           description: App not found
     
     delete:
+      tags:
+        - Apps
       summary: Delete app
       responses:
         '200':
@@ -194,6 +312,8 @@ paths:
           type: string
     
     get:
+      tags:
+        - Files
       summary: Get file content
       parameters:
         - name: path
@@ -213,6 +333,8 @@ paths:
                     $ref: '#/components/schemas/File'
     
     post:
+      tags:
+        - Files
       summary: Create file
       requestBody:
         required: true
@@ -239,6 +361,8 @@ paths:
                     $ref: '#/components/schemas/File'
     
     delete:
+      tags:
+        - Files
       summary: Delete file
       parameters:
         - name: path
@@ -269,6 +393,8 @@ paths:
           type: string
     
     get:
+      tags:
+        - Files
       summary: List directory contents
       parameters:
         - name: path
@@ -288,6 +414,8 @@ paths:
                     $ref: '#/components/schemas/Directory'
     
     post:
+      tags:
+        - Files
       summary: Create directory
       requestBody:
         required: true
@@ -408,4 +536,1171 @@ paths:
             application/zip:
               schema:
                 type: string
-                format: binary 
+                format: binary
+
+  /apps/{id}/search:
+    post:
+      tags:
+        - Analysis
+      summary: Search within app files
+      description: |
+        Perform a powerful search across all files in your application. 
+        Supports case-insensitive search and file pattern filtering.
+
+        ### Features
+        - 🔍 Case-insensitive search
+        - 🎯 File pattern filtering using glob patterns
+        - 📝 Line-by-line results with context
+        - ⚡ Fast indexing and search
+
+        ### Example Patterns
+        - `*.ts` - All TypeScript files
+        - `src/**/*.tsx` - All TSX files in src directory
+        - `**/*.{js,jsx}` - All JavaScript files
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the app
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                query:
+                  type: string
+                  description: Search query string
+                  example: "function handleSubmit"
+                filePattern:
+                  type: string
+                  description: Optional glob pattern to filter files
+                  example: "src/**/*.ts"
+            examples:
+              searchJS:
+                summary: Search in JavaScript files
+                value:
+                  query: "useState"
+                  filePattern: "**/*.js"
+              searchComponent:
+                summary: Search for a component
+                value:
+                  query: "export default"
+                  filePattern: "src/components/*.tsx"
+      responses:
+        '200':
+          description: Search results
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        file:
+                          type: string
+                          description: Relative path to the file
+                        line:
+                          type: integer
+                          description: Line number where the match was found
+                        content:
+                          type: string
+                          description: The matching line content
+              example:
+                data:
+                  - file: "src/components/Form.tsx"
+                    line: 15
+                    content: "  const [isSubmitting, setIsSubmitting] = useState(false);"
+        '404':
+          description: App not found
+        '500':
+          description: Server error
+
+  /apps/{id}/dependencies:
+    get:
+      tags:
+        - Dependencies
+      summary: Get app dependencies
+      description: |
+        Retrieve all dependencies defined in package.json.
+        Shows both regular dependencies and devDependencies.
+
+        ### Features
+        - 📦 List all dependencies
+        - 🛠️ Show dev dependencies
+        - 📊 Version information
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of dependencies
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  dependencies:
+                    type: object
+                    additionalProperties:
+                      type: string
+                  devDependencies:
+                    type: object
+                    additionalProperties:
+                      type: string
+              example:
+                dependencies:
+                  react: "^18.0.0"
+                  "react-dom": "^18.0.0"
+                devDependencies:
+                  typescript: "^5.0.0"
+                  "@types/react": "^18.0.0"
+        '404':
+          description: App not found
+        '500':
+          description: Server error
+    
+    post:
+      tags:
+        - Dependencies
+      summary: Add or update dependencies
+      description: |
+        Add or update package dependencies in your app.
+        Supports both regular and dev dependencies.
+
+        ### Features
+        - 📦 Add new dependencies
+        - 🔄 Update existing dependencies
+        - 🛠️ Specify dev dependencies
+        - 🎯 Automatic package.json updates
+
+        ### Tips
+        - Use exact versions for critical dependencies
+        - Use caret (^) for flexible versioning
+        - Consider using dev dependencies for build tools
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                dependencies:
+                  type: object
+                  description: Dependencies to add/update
+                  additionalProperties:
+                    type: string
+                dev:
+                  type: boolean
+                  description: Whether to add as dev dependency
+            examples:
+              addReact:
+                summary: Add React dependencies
+                value:
+                  dependencies:
+                    react: "^18.0.0"
+                    "react-dom": "^18.0.0"
+                  dev: false
+              addTypescript:
+                summary: Add TypeScript dev dependencies
+                value:
+                  dependencies:
+                    typescript: "^5.0.0"
+                    "@types/react": "^18.0.0"
+                  dev: true
+      responses:
+        '200':
+          description: Dependencies updated successfully
+        '404':
+          description: App not found
+        '500':
+          description: Server error
+
+  /apps/{id}/stats:
+    get:
+      tags:
+        - Analysis
+      summary: Get app statistics
+      description: |
+        Retrieve comprehensive statistics about your app.
+        Includes file counts, sizes, and type distribution.
+
+        ### Features
+        - 📊 Total file count
+        - 📏 Code size metrics
+        - 📁 File type distribution
+        - ⏰ Last modified information
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: App statistics
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  fileCount:
+                    type: integer
+                    description: Total number of files
+                  totalSize:
+                    type: integer
+                    description: Total size in bytes
+                  lastModified:
+                    type: string
+                    format: date-time
+                    description: Last modification timestamp
+                  fileTypes:
+                    type: object
+                    additionalProperties:
+                      type: integer
+                    description: Count of files by extension
+              example:
+                fileCount: 25
+                totalSize: 128500
+                lastModified: "2024-01-29T12:00:00Z"
+                fileTypes:
+                  ".ts": 10
+                  ".tsx": 8
+                  ".css": 4
+                  ".json": 3
+        '404':
+          description: App not found
+        '500':
+          description: Server error
+
+  /apps/{id}/lint:
+    post:
+      tags:
+        - Analysis
+      summary: Run linter on app
+      description: |
+        Execute linting on app files with optional auto-fixing.
+        Supports TypeScript and JavaScript files.
+
+        ### Features
+        - ✨ Automatic code fixing
+        - 🎯 Selective file linting
+        - 📝 Detailed error reporting
+        - 🔍 TypeScript support
+
+        ### Supported File Types
+        - .js, .jsx (JavaScript)
+        - .ts, .tsx (TypeScript)
+
+        ### Common Issues Detected
+        - Unused variables
+        - Missing dependencies
+        - Code style violations
+        - Type errors
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fix:
+                  type: boolean
+                  description: Whether to automatically fix linting issues
+                paths:
+                  type: array
+                  items:
+                    type: string
+                  description: Specific files to lint
+            examples:
+              lintAll:
+                summary: Lint all files with auto-fix
+                value:
+                  fix: true
+              lintSpecific:
+                summary: Lint specific files
+                value:
+                  fix: false
+                  paths: ["src/components/Button.tsx", "src/utils/helpers.ts"]
+      responses:
+        '200':
+          description: Linting results
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  issues:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        file:
+                          type: string
+                          description: Relative path to the file
+                        line:
+                          type: integer
+                          description: Line number of the issue
+                        column:
+                          type: integer
+                          description: Column number of the issue
+                        message:
+                          type: string
+                          description: Description of the issue
+                        severity:
+                          type: string
+                          enum: [error, warning, info]
+                          description: Severity level of the issue
+              example:
+                issues:
+                  - file: "src/components/Button.tsx"
+                    line: 15
+                    column: 10
+                    message: "Unused variable 'props'"
+                    severity: "warning"
+        '404':
+          description: App not found
+        '500':
+          description: Server error
+
+  /apps/{id}/publish:
+    post:
+      tags:
+        - Apps
+        - Deployment
+      summary: Publish app
+      description: |
+        Publish the latest commit of your app and make it accessible via a public URL.
+        
+        ### Features
+        - 🌐 Instant public URL generation
+        - 🔄 Automatic deployment from latest commit
+        - 📊 Deployment status tracking
+        - 🔒 Optional password protection
+        - 📈 Access analytics
+
+        ### Publishing Options
+        - Custom domain support
+        - Password protection
+        - Analytics tracking
+        - Cache control
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The app ID to publish
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                customDomain:
+                  type: string
+                  description: Optional custom domain to use
+                  example: "myapp.example.com"
+                password:
+                  type: string
+                  description: Optional password protection
+                cacheControl:
+                  type: string
+                  description: Cache control header value
+                  example: "max-age=3600"
+                analytics:
+                  type: boolean
+                  description: Enable access analytics
+                  default: true
+            examples:
+              simple:
+                summary: Simple publish
+                value: {}
+              withCustomDomain:
+                summary: Publish with custom domain
+                value:
+                  customDomain: "myapp.example.com"
+              withProtection:
+                summary: Password protected publish
+                value:
+                  password: "secret123"
+                  analytics: true
+      responses:
+        '200':
+          description: Successfully published
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url:
+                    type: string
+                    description: Public URL of the app
+                  deploymentId:
+                    type: string
+                    description: Unique deployment identifier
+                  status:
+                    type: string
+                    enum: [deployed, deploying]
+                  commit:
+                    type: string
+                    description: Deployed commit SHA
+                  analytics:
+                    type: object
+                    properties:
+                      enabled:
+                        type: boolean
+                      dashboardUrl:
+                        type: string
+              example:
+                url: "https://myapp-abc123.codelive.app"
+                deploymentId: "dep_abc123"
+                status: "deployed"
+                commit: "a1b2c3d4"
+                analytics:
+                  enabled: true
+                  dashboardUrl: "https://codelive.app/analytics/dep_abc123"
+        '400':
+          description: Invalid request or configuration
+        '404':
+          description: App not found
+        '500':
+          description: Deployment failed
+
+  /apps/{id}/deployments:
+    get:
+      tags:
+        - Apps
+        - Deployment
+      summary: List app deployments
+      description: |
+        Get a list of all deployments for an app.
+        
+        ### Features
+        - 📋 Deployment history
+        - 📊 Status tracking
+        - 📈 Analytics data
+        - 🔄 Rollback options
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+          description: Number of deployments to return
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [deployed, deploying, failed]
+          description: Filter by deployment status
+      responses:
+        '200':
+          description: List of deployments
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  deployments:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        url:
+                          type: string
+                        status:
+                          type: string
+                          enum: [deployed, deploying, failed]
+                        commit:
+                          type: string
+                        createdAt:
+                          type: string
+                          format: date-time
+                        analytics:
+                          type: object
+                          properties:
+                            visits:
+                              type: integer
+                            uniqueVisitors:
+                              type: integer
+              example:
+                deployments:
+                  - id: "dep_abc123"
+                    url: "https://myapp-abc123.codelive.app"
+                    status: "deployed"
+                    commit: "a1b2c3d4"
+                    createdAt: "2024-01-29T12:00:00Z"
+                    analytics:
+                      visits: 1250
+                      uniqueVisitors: 843
+        '404':
+          description: App not found
+
+  /apps/{id}/deployments/{deploymentId}:
+    get:
+      tags:
+        - Apps
+        - Deployment
+      summary: Get deployment details
+      description: |
+        Get detailed information about a specific deployment.
+        
+        ### Features
+        - 📊 Detailed status information
+        - 📈 Real-time analytics
+        - 🔍 Deployment configuration
+        - 📝 Build and deploy logs
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: deploymentId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Deployment details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  url:
+                    type: string
+                  status:
+                    type: string
+                  commit:
+                    type: string
+                  config:
+                    type: object
+                    properties:
+                      customDomain:
+                        type: string
+                      hasPassword:
+                        type: boolean
+                      cacheControl:
+                        type: string
+                  analytics:
+                    type: object
+                    properties:
+                      visits:
+                        type: integer
+                      uniqueVisitors:
+                        type: integer
+                      avgLoadTime:
+                        type: number
+                  logs:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        timestamp:
+                          type: string
+                        level:
+                          type: string
+                        message:
+                          type: string
+              example:
+                id: "dep_abc123"
+                url: "https://myapp-abc123.codelive.app"
+                status: "deployed"
+                commit: "a1b2c3d4"
+                config:
+                  customDomain: "myapp.example.com"
+                  hasPassword: true
+                  cacheControl: "max-age=3600"
+                analytics:
+                  visits: 1250
+                  uniqueVisitors: 843
+                  avgLoadTime: 0.45
+                logs:
+                  - timestamp: "2024-01-29T12:00:00Z"
+                    level: "info"
+                    message: "Deployment started"
+                  - timestamp: "2024-01-29T12:00:05Z"
+                    level: "info"
+                    message: "Build completed"
+                  - timestamp: "2024-01-29T12:00:10Z"
+                    level: "info"
+                    message: "Deployment successful"
+        '404':
+          description: App or deployment not found 
+
+  /apps/{id}/preview:
+    post:
+      tags:
+        - Apps
+        - Deployment
+      summary: Create live preview sandbox
+      description: |
+        Create an instant live preview sandbox of your app and get an E2B (Editor to Browser) link.
+        
+        ### Features
+        - 🚀 Instant sandbox creation
+        - 🔗 E2B (Editor to Browser) live preview link
+        - 🔄 Real-time code sync
+        - 🛠️ Development environment setup
+        - 📊 Resource monitoring
+
+        ### Preview Options
+        - Custom environment variables
+        - Port configuration
+        - Resource limits
+        - Preview expiration time
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The app ID to create preview for
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                env:
+                  type: object
+                  description: Environment variables for the preview
+                  additionalProperties:
+                    type: string
+                port:
+                  type: integer
+                  description: Port to expose for the preview
+                  default: 3000
+                ttl:
+                  type: integer
+                  description: Time to live in minutes for the preview
+                  default: 60
+                resourceLimits:
+                  type: object
+                  properties:
+                    cpu:
+                      type: string
+                      description: CPU limit (e.g. "1" for 1 core)
+                    memory:
+                      type: string
+                      description: Memory limit (e.g. "1Gi" for 1GB)
+            examples:
+              simple:
+                summary: Simple preview
+                value: {}
+              withEnv:
+                summary: Preview with environment variables
+                value:
+                  env:
+                    API_KEY: "test-key"
+                    DEBUG: "true"
+                  port: 3000
+                  ttl: 120
+      responses:
+        '200':
+          description: Preview sandbox created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  previewId:
+                    type: string
+                    description: Unique preview identifier
+                  e2bUrl:
+                    type: string
+                    description: E2B live preview URL
+                  status:
+                    type: string
+                    enum: [creating, ready]
+                  expiresAt:
+                    type: string
+                    format: date-time
+                  resources:
+                    type: object
+                    properties:
+                      cpu:
+                        type: string
+                      memory:
+                        type: string
+                      uptime:
+                        type: integer
+              example:
+                previewId: "prev_xyz789"
+                e2bUrl: "https://preview-xyz789.e2b.codelive.app"
+                status: "ready"
+                expiresAt: "2024-01-29T13:00:00Z"
+                resources:
+                  cpu: "1"
+                  memory: "1Gi"
+                  uptime: 120
+        '400':
+          description: Invalid request or configuration
+        '404':
+          description: App not found
+        '500':
+          description: Preview creation failed
+
+    get:
+      tags:
+        - Apps
+        - Deployment
+      summary: Get preview status
+      description: |
+        Get the status and details of an existing preview sandbox.
+        
+        ### Features
+        - 📊 Preview status
+        - 📈 Resource utilization
+        - ⏱️ Expiration tracking
+        - 🔍 Access logs
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The app ID to get preview for
+      responses:
+        '200':
+          description: Preview status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  previewId:
+                    type: string
+                  e2bUrl:
+                    type: string
+                  status:
+                    type: string
+                    enum: [creating, ready, expired]
+                  expiresAt:
+                    type: string
+                    format: date-time
+                  resources:
+                    type: object
+                    properties:
+                      cpu:
+                        type: string
+                      memory:
+                        type: string
+                      uptime:
+                        type: integer
+                  logs:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        timestamp:
+                          type: string
+                        level:
+                          type: string
+                        message:
+                          type: string
+              example:
+                previewId: "prev_xyz789"
+                e2bUrl: "https://preview-xyz789.e2b.codelive.app"
+                status: "ready"
+                expiresAt: "2024-01-29T13:00:00Z"
+                resources:
+                  cpu: "1"
+                  memory: "1Gi"
+                  uptime: 120
+                logs:
+                  - timestamp: "2024-01-29T12:00:00Z"
+                    level: "info"
+                    message: "Preview sandbox created"
+                  - timestamp: "2024-01-29T12:00:05Z"
+                    level: "info"
+                    message: "Development environment ready"
+        '404':
+          description: App or preview not found
+
+    delete:
+      tags:
+        - Apps
+        - Deployment
+      summary: Delete preview sandbox
+      description: |
+        Delete an existing preview sandbox and free up resources.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The app ID to delete preview for
+      responses:
+        '200':
+          description: Preview deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  deleted:
+                    type: boolean
+                  previewId:
+                    type: string
+              example:
+                deleted: true
+                previewId: "prev_xyz789"
+        '404':
+          description: App or preview not found
+        '500':
+          description: Server error 
+
+  /apps/{id}/preview-sandbox:
+    post:
+      tags:
+        - Apps
+        - Deployment
+      summary: Create preview sandbox
+      description: |
+        Create a sandboxed preview environment for the app using Docker.
+        
+        ### Features
+        - 🔒 Isolated Docker environment
+        - 🔄 Real-time code sync
+        - 🛠️ Development environment setup
+        - 📊 Resource monitoring
+        - ⏱️ Auto-expiration
+
+        ### Preview Options
+        - Custom environment variables
+        - Port configuration
+        - Resource limits
+        - Preview expiration time
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The app ID to create preview for
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                env:
+                  type: object
+                  description: Environment variables for the preview
+                  additionalProperties:
+                    type: string
+                port:
+                  type: integer
+                  description: Port to expose for the preview
+                  default: 3000
+                ttl:
+                  type: integer
+                  description: Time to live in minutes for the preview
+                  default: 60
+                resourceLimits:
+                  type: object
+                  properties:
+                    cpu:
+                      type: string
+                      description: CPU limit (e.g. "1" for 1 core)
+                    memory:
+                      type: string
+                      description: Memory limit (e.g. "1Gi" for 1GB)
+            examples:
+              simple:
+                summary: Simple preview
+                value: {}
+              withEnv:
+                summary: Preview with environment variables
+                value:
+                  env:
+                    API_KEY: "test-key"
+                    DEBUG: "true"
+                  port: 3000
+                  ttl: 120
+      responses:
+        '200':
+          description: Preview sandbox created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sandboxId:
+                    type: string
+                    description: Unique sandbox identifier
+                  url:
+                    type: string
+                    description: Preview URL
+                  status:
+                    type: string
+                    enum: [creating, ready, error]
+                  error:
+                    type: string
+                    description: Error message if status is error
+                  expiresAt:
+                    type: string
+                    format: date-time
+                  commitSha:
+                    type: string
+                    description: Git commit SHA being previewed
+                  resources:
+                    type: object
+                    properties:
+                      cpu:
+                        type: string
+                      memory:
+                        type: string
+                      uptime:
+                        type: integer
+                  logs:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        timestamp:
+                          type: string
+                        level:
+                          type: string
+                        message:
+                          type: string
+              example:
+                sandboxId: "sb_xyz789"
+                url: "http://localhost:3000"
+                status: "ready"
+                expiresAt: "2024-01-29T13:00:00Z"
+                commitSha: "abc123def456"
+                resources:
+                  cpu: "1"
+                  memory: "1Gi"
+                  uptime: 120
+                logs:
+                  - timestamp: "2024-01-29T12:00:00Z"
+                    level: "info"
+                    message: "Sandbox created"
+        '400':
+          description: Invalid request or configuration
+        '404':
+          description: App not found
+        '500':
+          description: Sandbox creation failed
+
+    get:
+      tags:
+        - Apps
+        - Deployment
+      summary: Get sandbox status
+      description: |
+        Get the status and details of an existing preview sandbox.
+        
+        ### Features
+        - 📊 Sandbox status
+        - 📈 Resource utilization
+        - ⏱️ Expiration tracking
+        - 🔍 Access logs
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The app ID
+        - name: sandboxId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The sandbox ID to get status for
+      responses:
+        '200':
+          description: Sandbox status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sandboxId:
+                    type: string
+                  url:
+                    type: string
+                  status:
+                    type: string
+                    enum: [creating, ready, error]
+                  error:
+                    type: string
+                  expiresAt:
+                    type: string
+                    format: date-time
+                  commitSha:
+                    type: string
+                  resources:
+                    type: object
+                    properties:
+                      cpu:
+                        type: string
+                      memory:
+                        type: string
+                      uptime:
+                        type: integer
+                  logs:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        timestamp:
+                          type: string
+                        level:
+                          type: string
+                        message:
+                          type: string
+        '404':
+          description: App or sandbox not found
+
+    delete:
+      tags:
+        - Apps
+        - Deployment
+      summary: Delete preview sandbox
+      description: |
+        Delete an existing preview sandbox and clean up resources.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The app ID
+        - name: sandboxId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The sandbox ID to delete
+      responses:
+        '200':
+          description: Sandbox deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  deleted:
+                    type: boolean
+                  sandboxId:
+                    type: string
+              example:
+                deleted: true
+                sandboxId: "sb_xyz789"
+        '404':
+          description: App or sandbox not found
+        '500':
+          description: Server error
+
+  /execute:
+    tags:
+      - Code Execution
+    post:
+      tags:
+        - Code Execution
+      summary: Execute Python code
+      description: Execute Python code in a controlled environment with file handling capabilities
+      operationId: executeCode
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - code
+              properties:
+                code:
+                  type: string
+                  description: The Python code to execute
+                  example: "print('Hello, World!')"
+                files:
+                  type: array
+                  description: Optional files to be available during code execution
+                  items:
+                    type: object
+                    required:
+                      - path
+                      - content
+                    properties:
+                      path:
+                        type: string
+                        description: The path where the file should be placed
+                      content:
+                        type: string
+                        description: The content of the file (base64 encoded if binary)
+      responses:
+        '200':
+          description: Successful code execution
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: boolean
+                  result:
+                    type: object
+                    properties:
+                      text:
+                        type: string
+                        description: The output of the code execution
+                      error:
+                        type: string
+                        description: Error message if execution failed
+                      file:
+                        type: object
+                        description: Present if the code requested a file download
+                        properties:
+                          path:
+                            type: string
+                            description: The path of the downloaded file
+                          content:
+                            type: string
+                            description: The base64 encoded content of the file
+        '400':
+          description: Invalid request or missing code
+        '500':
+          description: Server error or execution failed 

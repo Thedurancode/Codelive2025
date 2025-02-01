@@ -60,11 +60,19 @@ import {
   getFlatFilesForApp,
 } from '../apps/disk.mjs';
 import { CreateAppSchema } from '../apps/schemas.mjs';
-import { AppGenerationFeedbackType } from '@srcbook/shared';
+import { AppGenerationFeedbackType, randomid } from '@srcbook/shared';
 import { createZipFromApp } from '../apps/disk.mjs';
 import { checkoutCommit, commitAllFiles, getCurrentCommitSha } from '../apps/git.mjs';
 import { streamJsonResponse } from './utils.mjs';
 import swaggerRouter from './swagger.mjs';
+import { ESLint } from 'eslint';
+import { minimatch } from 'minimatch';
+import type { FileContent } from '../ai/app-parser.mjs';
+import type { App as DBAppType } from '../db/schema.mjs';
+import { deployToModal } from '../apps/deployment/modal.mjs';
+import { createPreview, getPreview, deletePreview } from '../apps/preview.mjs';
+import { executeCode, uploadFile, downloadFile } from '../ai/code-executor.mjs';
+import { createSandbox, getSandbox, deleteSandbox } from '../apps/sandbox.mjs';
 
 const app: Application = express();
 
@@ -836,5 +844,487 @@ router.post('/apps/:id/feedback', cors(), async (req, res) => {
   } catch (error) {
     console.error('Error sending feedback:', error);
     return res.status(500).json({ error: 'Failed to send feedback' });
+  }
+});
+
+router.options('/apps/:id/prompt', cors());
+router.post('/apps/:id/prompt', cors(), async (req, res) => {
+  const { id } = req.params;
+  const { query } = req.body;
+
+  console.log(`[Prompt API] Received request for app ${id} with query: ${query}`);
+
+  if (typeof query !== 'string' || query.trim() === '') {
+    console.log('[Prompt API] Error: Empty or invalid query');
+    return res.status(400).json({ error: 'Query is required' });
+  }
+
+  try {
+    const app = await loadApp(id);
+
+    if (!app) {
+      console.log(`[Prompt API] Error: App ${id} not found`);
+      return res.status(404).json({ error: 'App not found' });
+    }
+
+    console.log(`[Prompt API] Processing changes for app: ${app.name} (${app.externalId})`);
+    posthog.capture({ event: 'user prompted app with ai', properties: { query } });
+    
+    const validName = toValidPackageName(app.name);
+    console.log(`[Prompt API] Getting files for app ${validName}`);
+    const files = await getFlatFilesForApp(String(app.externalId));
+    console.log(`[Prompt API] Found ${files.length} files to process`);
+
+    const planId = randomid();
+    console.log(`[Prompt API] Generated plan ID: ${planId}`);
+
+    console.log(`[Prompt API] Streaming edit changes...`);
+    const result = await streamEditApp(validName, files, query, app.externalId, planId);
+    
+    console.log(`[Prompt API] Parsing plan...`);
+    const planStream = await streamParsePlan(result, app, query, planId);
+
+    console.log(`[Prompt API] Sending response stream...`);
+    return streamJsonResponse(planStream, res, { status: 200 });
+  } catch (e) {
+    const error = e as Error;
+    console.error('[Prompt API] Error processing request:', error);
+    console.error(error.stack);
+    return error500(res, e as Error);
+  }
+});
+
+interface SearchResult {
+  file: string;
+  line: number;
+  content: string;
+}
+
+interface FileStats {
+  fileCount: number;
+  totalSize: number;
+  lastModified: string;
+  fileTypes: Record<string, number>;
+}
+
+interface LintIssue {
+  file: string;
+  line: number;
+  column: number;
+  message: string;
+  severity: 'error' | 'warning' | 'info';
+}
+
+router.options('/apps/:id/search', cors());
+router.post('/apps/:id/search', cors(), async (req, res) => {
+  const { id } = req.params;
+  const { query, filePattern } = req.body;
+
+  try {
+    const app = await loadApp(id);
+    if (!app) {
+      return res.status(404).json({ error: 'App not found' });
+    }
+
+    const files = await getFlatFilesForApp(String(app.externalId));
+    const results: SearchResult[] = [];
+
+    for (const file of files) {
+      if (filePattern && !minimatch(file.filename, filePattern, { matchBase: true })) {
+        continue;
+      }
+
+      const content = file.content;
+      const lines = content.split('\n');
+      
+      lines.forEach((line, index) => {
+        if (line.toLowerCase().includes(query.toLowerCase())) {
+          results.push({
+            file: file.filename,
+            line: index + 1,
+            content: line.trim()
+          });
+        }
+      });
+    }
+
+    return res.json({ data: results });
+  } catch (e) {
+    return error500(res, e as Error);
+  }
+});
+
+router.options('/apps/:id/dependencies', cors());
+router.get('/apps/:id/dependencies', cors(), async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const app = await loadApp(id);
+    if (!app) {
+      return res.status(404).json({ error: 'App not found' });
+    }
+
+    const files = await getFlatFilesForApp(String(app.externalId));
+    const packageJson = files.find(f => f.filename === 'package.json');
+    
+    if (!packageJson) {
+      return res.json({
+        dependencies: {},
+        devDependencies: {}
+      });
+    }
+
+    const parsed = JSON.parse(packageJson.content);
+    return res.json({
+      dependencies: parsed.dependencies || {},
+      devDependencies: parsed.devDependencies || {}
+    });
+  } catch (e) {
+    return error500(res, e as Error);
+  }
+});
+
+router.post('/apps/:id/dependencies', cors(), async (req, res) => {
+  const { id } = req.params;
+  const { dependencies, dev } = req.body;
+
+  try {
+    const app = await loadApp(id);
+    if (!app) {
+      return res.status(404).json({ error: 'App not found' });
+    }
+
+    const files = await getFlatFilesForApp(String(app.externalId));
+    const packageJson = files.find(f => f.filename === 'package.json');
+    
+    if (!packageJson) {
+      return res.status(404).json({ error: 'package.json not found' });
+    }
+
+    const parsed = JSON.parse(packageJson.content);
+    const targetField = dev ? 'devDependencies' : 'dependencies';
+    parsed[targetField] = { ...parsed[targetField], ...dependencies };
+
+    await createFile(app, '.', 'package.json', JSON.stringify(parsed, null, 2));
+    return res.json({ success: true });
+  } catch (e) {
+    return error500(res, e as Error);
+  }
+});
+
+router.options('/apps/:id/stats', cors());
+router.get('/apps/:id/stats', cors(), async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const app = await loadApp(id);
+    if (!app) {
+      return res.status(404).json({ error: 'App not found' });
+    }
+
+    const files = await getFlatFilesForApp(String(app.externalId));
+    let totalSize = 0;
+    const fileTypes: Record<string, number> = {};
+
+    for (const file of files) {
+      totalSize += Buffer.byteLength(file.content, 'utf8');
+      const ext = Path.extname(file.filename).toLowerCase();
+      fileTypes[ext] = (fileTypes[ext] || 0) + 1;
+    }
+
+    const stats: FileStats = {
+      fileCount: files.length,
+      totalSize,
+      lastModified: new Date().toISOString(),
+      fileTypes
+    };
+
+    return res.json(stats);
+  } catch (e) {
+    return error500(res, e as Error);
+  }
+});
+
+router.options('/apps/:id/lint', cors());
+router.post('/apps/:id/lint', cors(), async (req, res) => {
+  const { id } = req.params;
+  const { fix = false, paths = [] } = req.body;
+
+  try {
+    const app = await loadApp(id);
+    if (!app) {
+      return res.status(404).json({ error: 'App not found' });
+    }
+
+    // Create ESLint instance with minimal configuration
+    const eslint = new ESLint({ fix });
+
+    const files = await getFlatFilesForApp(String(app.externalId));
+    const filesToLint = paths.length > 0 
+      ? paths.map((p: string) => files.find(f => f.filename === p)?.filename).filter(Boolean) as string[]
+      : files.filter(f => f.filename.match(/\.(js|jsx|ts|tsx)$/)).map(f => f.filename);
+
+    const results = await eslint.lintFiles(filesToLint);
+    if (fix) {
+      await ESLint.outputFixes(results);
+    }
+
+    const issues: LintIssue[] = results.flatMap(result => 
+      result.messages.map(msg => ({
+        file: Path.relative(app.externalId, result.filePath),
+        line: msg.line,
+        column: msg.column,
+        message: msg.message,
+        severity: msg.severity === 2 ? 'error' : 'warning'
+      }))
+    );
+
+    return res.json({ issues });
+  } catch (e) {
+    return error500(res, e as Error);
+  }
+});
+
+router.options('/apps/:id/publish', cors());
+router.post('/apps/:id/publish', cors(), async (req, res) => {
+  const { id } = req.params;
+  const { analytics = true, customDomain, password, cacheControl } = req.body;
+
+  try {
+    const app = await loadApp(id);
+    if (!app) {
+      return res.status(404).json({ error: 'App not found' });
+    }
+
+    // Get current commit SHA
+    const commit = await getCurrentCommitSha(app);
+
+    // Generate a unique deployment ID
+    const deploymentId = `dep_${Date.now().toString(36)}${Math.random().toString(36).substr(2, 5)}`;
+
+    // Deploy using Modal
+    const modalConfig = {
+      token: process.env.MODAL_TOKEN || 'ak-ii2SSYFGmwipwOx4BMRS7s',
+      projectId: app.externalId
+    };
+
+    console.log('Starting Modal deployment with config:', {
+      ...modalConfig,
+      token: '***' // Hide token in logs
+    });
+
+    const deployment = await deployToModal(app, modalConfig);
+
+    if (!deployment.success) {
+      console.error('Modal deployment failed:', deployment.error);
+      return res.status(500).json({ error: deployment.error });
+    }
+
+    console.log('Modal deployment successful:', deployment);
+
+    // Store deployment info in database
+    const deploymentInfo = {
+      id: deploymentId,
+      url: deployment.url,
+      status: 'deployed',
+      commit,
+      createdAt: new Date().toISOString(),
+      config: {
+        customDomain,
+        hasPassword: !!password,
+        cacheControl
+      },
+      analytics: {
+        enabled: analytics,
+        visits: 0,
+        uniqueVisitors: 0,
+        avgLoadTime: 0
+      }
+    };
+
+    return res.json(deploymentInfo);
+  } catch (e) {
+    console.error('Deployment error:', e);
+    return error500(res, e as Error);
+  }
+});
+
+router.options('/apps/:id/deployments', cors());
+router.get('/apps/:id/deployments', cors(), async (req, res) => {
+  const { id } = req.params;
+  const limit = parseInt(req.query.limit as string) || 10;
+  const status = req.query.status as string;
+
+  try {
+    const app = await loadApp(id);
+    if (!app) {
+      return res.status(404).json({ error: 'App not found' });
+    }
+
+    // TODO: Get deployments from database
+    // For now return mock data
+    const mockDeployment = {
+      id: 'dep_abc123',
+      url: `https://${app.name}-${app.externalId.substring(0, 6)}.codelive.app`,
+      status: 'deployed',
+      commit: await getCurrentCommitSha(app),
+      createdAt: new Date().toISOString(),
+      analytics: {
+        visits: 0,
+        uniqueVisitors: 0
+      }
+    };
+
+    return res.json({ deployments: [mockDeployment] });
+  } catch (e) {
+    return error500(res, e as Error);
+  }
+});
+
+router.options('/apps/:id/deployments/:deploymentId', cors());
+router.get('/apps/:id/deployments/:deploymentId', cors(), async (req, res) => {
+  const { id, deploymentId } = req.params;
+
+  try {
+    const app = await loadApp(id);
+    if (!app) {
+      return res.status(404).json({ error: 'App not found' });
+    }
+
+    // TODO: Get deployment from database
+    // For now return mock data
+    const mockDeployment = {
+      id: deploymentId,
+      url: `https://${app.name}-${app.externalId.substring(0, 6)}.codelive.app`,
+      status: 'deployed',
+      commit: await getCurrentCommitSha(app),
+      config: {
+        customDomain: null,
+        hasPassword: false,
+        cacheControl: 'max-age=3600'
+      },
+      analytics: {
+        visits: 0,
+        uniqueVisitors: 0,
+        avgLoadTime: 0
+      },
+      logs: [
+        {
+          timestamp: new Date().toISOString(),
+          level: 'info',
+          message: 'Deployment successful'
+        }
+      ]
+    };
+
+    return res.json(mockDeployment);
+  } catch (e) {
+    return error500(res, e as Error);
+  }
+});
+
+router.options('/apps/:id/preview-sandbox', cors());
+router.post('/apps/:id/preview-sandbox', cors(), async (req, res) => {
+  const { id } = req.params;
+  const config = req.body;
+
+  try {
+    const app = await loadApp(id);
+    if (!app) {
+      return res.status(404).json({ error: 'App not found' });
+    }
+
+    posthog.capture({ event: 'user created preview sandbox', properties: { appId: id } });
+    const sandbox = await createSandbox(app, config);
+    return res.json(sandbox);
+  } catch (e) {
+    return error500(res, e as Error);
+  }
+});
+
+router.get('/apps/:id/preview-sandbox/:sandboxId', cors(), async (req, res) => {
+  const { id, sandboxId } = req.params;
+
+  try {
+    const app = await loadApp(id);
+    if (!app) {
+      return res.status(404).json({ error: 'App not found' });
+    }
+
+    const sandbox = await getSandbox(app, sandboxId);
+    if (!sandbox) {
+      return res.status(404).json({ error: 'Sandbox not found' });
+    }
+
+    return res.json(sandbox);
+  } catch (e) {
+    return error500(res, e as Error);
+  }
+});
+
+router.delete('/apps/:id/preview-sandbox/:sandboxId', cors(), async (req, res) => {
+  const { id, sandboxId } = req.params;
+
+  try {
+    const app = await loadApp(id);
+    if (!app) {
+      return res.status(404).json({ error: 'App not found' });
+    }
+
+    const deleted = await deleteSandbox(app, sandboxId);
+    if (!deleted) {
+      return res.status(404).json({ error: 'Sandbox not found' });
+    }
+
+    return res.json({ deleted: true, sandboxId });
+  } catch (e) {
+    return error500(res, e as Error);
+  }
+});
+
+// Execute code in Python environment
+router.options('/execute', cors());
+router.post('/execute', cors(), async (req, res) => {
+  const { code, files } = req.body;
+
+  if (typeof code !== 'string') {
+    return res.json({ error: true, result: 'Code must be a string' });
+  }
+
+  try {
+    // Handle file uploads if provided
+    if (files && Array.isArray(files)) {
+      for (const file of files) {
+        if (file && typeof file === 'object' && 'path' in file && 'content' in file && 
+            typeof file.path === 'string' && (typeof file.content === 'string' || Buffer.isBuffer(file.content))) {
+          await uploadFile(file.path, file.content);
+        }
+      }
+    }
+
+    posthog.capture({ event: 'user executed code', properties: { code } });
+    const result = await executeCode(code);
+
+    // Handle file downloads if requested in the code
+    if (result.text.includes('FILE_DOWNLOAD:')) {
+      const filePath = result.text.split('FILE_DOWNLOAD:')[1].trim();
+      const fileContent = await downloadFile(filePath);
+      return res.json({ 
+        error: false, 
+        result: {
+          ...result,
+          file: {
+            path: filePath,
+            content: fileContent.toString('base64')
+          }
+        }
+      });
+    }
+
+    return res.json({ error: false, result });
+  } catch (e) {
+    const error = e as unknown as Error;
+    console.error(error);
+    return res.json({ error: true, result: error.stack });
   }
 });
