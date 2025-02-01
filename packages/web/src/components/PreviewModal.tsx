@@ -2,6 +2,7 @@ import { Dialog, DialogContent } from '@srcbook/components';
 import { useCallback, useEffect, useState } from 'react';
 import { Sandbox, Image } from 'modal';
 import { modalClient } from '../lib/modal';
+import { Loader2 } from 'lucide-react';
 
 interface PreviewModalProps {
   isOpen: boolean;
@@ -14,6 +15,7 @@ export function PreviewModal({ isOpen, onOpenChange, previewCommand }: PreviewMo
   const [output, setOutput] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [stage, setStage] = useState<'initializing' | 'creating-sandbox' | 'running' | 'error'>('initializing');
 
   useEffect(() => {
     if (!isOpen) return;
@@ -22,13 +24,16 @@ export function PreviewModal({ isOpen, onOpenChange, previewCommand }: PreviewMo
     let isMounted = true;
 
     const initializeSandbox = async () => {
-      await modalClient.authenticate();
-      const app = await modalClient.apps.lookup("codelive-preview", { create_if_missing: true });
+      setStage('initializing');
       setIsLoading(true);
       setError(null);
       setOutput([]);
       
       try {
+        await modalClient.authenticate();
+        const app = await modalClient.apps.lookup("codelive-preview", { create_if_missing: true });
+        
+        setStage('creating-sandbox');
         // Create sandbox with custom configuration
         const sb = await Sandbox.create({
           app,
@@ -48,27 +53,20 @@ export function PreviewModal({ isOpen, onOpenChange, previewCommand }: PreviewMo
           workdir: "/app",
         });
 
-        if (!isMounted) {
-          await sb.terminate();
-          return;
-        }
-
+        if (!isMounted) return;
+        
         activeSandbox = sb;
         setSandbox(sb);
+        setStage('running');
         
-        // Execute the preview command
-        const process = await sb.exec(...previewCommand);
-        
-        // Stream output
-        for await (const line of process.stdout) {
-          if (isMounted) {
-            setOutput(prev => [...prev, line]);
-          }
-        }
+        // Run the preview command
+        const result = await sb.run(previewCommand);
+        setOutput(result.split('\n'));
       } catch (err) {
-        if (isMounted) {
-          setError(err instanceof Error ? err.message : 'Unknown error');
-        }
+        if (!isMounted) return;
+        console.error('Preview error:', err);
+        setError(err instanceof Error ? err.message : 'Failed to initialize preview');
+        setStage('error');
       } finally {
         if (isMounted) {
           setIsLoading(false);
@@ -81,8 +79,7 @@ export function PreviewModal({ isOpen, onOpenChange, previewCommand }: PreviewMo
     return () => {
       isMounted = false;
       if (activeSandbox) {
-        activeSandbox.terminate();
-        setSandbox(null);
+        activeSandbox.cleanup().catch(console.error);
       }
     };
   }, [isOpen, previewCommand]);
@@ -90,8 +87,25 @@ export function PreviewModal({ isOpen, onOpenChange, previewCommand }: PreviewMo
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-[90vw] h-[90vh] flex flex-col">
-        {isLoading && <div className="p-4">Initializing sandbox...</div>}
-        {error && <div className="p-4 text-red-500">Error: {error}</div>}
+        {isLoading && (
+          <div className="flex items-center gap-2 p-4 text-muted-foreground">
+            <Loader2 className="w-4 h-4 animate-spin" />
+            <span>
+              {stage === 'initializing' && 'Initializing preview...'}
+              {stage === 'creating-sandbox' && 'Creating sandbox environment...'}
+              {stage === 'running' && 'Starting preview server...'}
+            </span>
+          </div>
+        )}
+        
+        {error && (
+          <div className="p-4 text-destructive bg-destructive/10 rounded-md">
+            <strong>Error:</strong> {error}
+            <div className="mt-2 text-sm text-muted-foreground">
+              Please check your Modal.com API credentials and try again.
+            </div>
+          </div>
+        )}
 
         <div className="flex-1 overflow-auto bg-black text-white p-4 font-mono text-sm">
           {output.map((line, i) => (

@@ -8,5 +8,24 @@ export default defineConfig({
   },
   server: {
     hmr: true,
+    watch: {
+      usePolling: true,
+      interval: 100
+    }
   },
+  optimizeDeps: {
+    include: ['@srcbook/shared']
+  },
+  build: {
+    sourcemap: true,
+    minify: false,
+    rollupOptions: {
+      external: [
+        /node:.*/, 
+        'express',
+        'ws',
+        'cors'
+      ]
+    }
+  }
 });

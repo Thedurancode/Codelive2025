@@ -47,7 +47,7 @@ import WebSocketClient from '@/clients/websocket/client';
 import SRCBOOK_CONFIG from '@/config';
 
 // Establish websocket connection immediately.
-const client = new WebSocketClient(`ws://${SRCBOOK_CONFIG.api.host}/websocket`);
+const client = new WebSocketClient(SRCBOOK_CONFIG.api.websocket);
 
 export default client;
 const IncomingSessionEvents = {
